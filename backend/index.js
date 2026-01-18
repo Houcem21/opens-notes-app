@@ -1,6 +1,7 @@
 // backend/index.js
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -15,8 +16,21 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// In-memory store (MVP). Will be replaced by DB later.
-let notes = [];
+// MongoDB connection (URL provided by OpenShift env var)
+const MONGO_URL = process.env.MONGO_URL;
+
+// Define Note schema + model
+const noteSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { versionKey: false }
+);
+
+const Note = mongoose.model("Note", noteSchema);
+
 
 // Health check (useful for OpenShift readiness probes)
 app.get("/healthz", (req, res) => {
@@ -24,45 +38,65 @@ app.get("/healthz", (req, res) => {
 });
 
 // Get all notes
-app.get("/notes", (req, res) => {
-  res.status(200).json(notes);
+app.get("/notes", async (req, res) => {
+  try {
+    const notes = await Note.find().sort({ createdAt: -1 }).lean();
+    // Convert _id to id for your frontend
+    const formatted = notes.map((n) => ({ ...n, id: String(n._id) , _id: undefined }));
+    res.status(200).json(formatted);
+  } catch (err) {
+    console.error("GET /notes failed:", err);
+    res.status(500).json({ error: "Failed to fetch notes" });
+  }
 });
 
+
 // Create a note
-app.post("/notes", (req, res) => {
-  const { title, content } = req.body || {};
+app.post("/notes", async (req, res) => {
+  try {
+    const { title, content } = req.body || {};
 
-  if (!title || !content) {
-    return res.status(400).json({
-      error: "Missing required fields: title, content",
+    if (!title || !content) {
+      return res.status(400).json({
+        error: "Missing required fields: title, content",
+      });
+    }
+
+    const created = await Note.create({
+      title: String(title),
+      content: String(content),
     });
+
+    res.status(201).json({
+      id: String(created._id),
+      title: created.title,
+      content: created.content,
+      createdAt: created.createdAt,
+    });
+  } catch (err) {
+    console.error("POST /notes failed:", err);
+    res.status(500).json({ error: "Failed to create note" });
   }
-
-  const newNote = {
-    id: Date.now().toString(), // simple MVP id
-    title: String(title),
-    content: String(content),
-    createdAt: new Date().toISOString(),
-  };
-
-  notes.push(newNote);
-  res.status(201).json(newNote);
 });
 
 // Delete a note by id
-app.delete("/notes/:id", (req, res) => {
-  const { id } = req.params;
+app.delete("/notes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  const before = notes.length;
-  notes = notes.filter((n) => n.id !== id);
+    const result = await Note.deleteOne({ _id: id });
 
-  // If nothing was removed, return 404 (cleaner for frontend)
-  if (notes.length === before) {
-    return res.status(404).json({ error: "Note not found" });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error("DELETE /notes/:id failed:", err);
+    res.status(500).json({ error: "Failed to delete note" });
   }
-
-  res.status(200).json({ ok: true });
 });
+
 
 // Optional: clear all notes (handy for testing) — remove later if you want
 // app.delete("/notes", (req, res) => {
@@ -70,6 +104,23 @@ app.delete("/notes/:id", (req, res) => {
 //   res.status(200).json({ ok: true });
 // });
 
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-});
+async function start() {
+  if (!MONGO_URL) {
+    console.error("Missing MONGO_URL env var. Set it in OpenShift Deployment.");
+    process.exit(1);
+  }
+
+  try {
+    await mongoose.connect(MONGO_URL);
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => {
+      console.log(`Backend running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1);
+  }
+}
+
+start();
+
