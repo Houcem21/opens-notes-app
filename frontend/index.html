@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes MVP</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 16px; }
+      h1 { margin-bottom: 8px; }
+      .row { display: flex; gap: 8px; margin: 12px 0; }
+      input, textarea { width: 100%; padding: 10px; font-size: 14px; }
+      button { padding: 10px 14px; cursor: pointer; }
+      .note { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin: 10px 0; }
+      .note small { color: #666; }
+      .note-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+      .error { color: #b00020; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>Notes MVP</h1>
+    <p>Simple notes app (Frontend → Backend API)</p>
+
+    <div class="row">
+      <input id="title" placeholder="Title" />
+    </div>
+    <div class="row">
+      <textarea id="content" placeholder="Content" rows="4"></textarea>
+    </div>
+    <div class="row">
+      <button id="addBtn">Add Note</button>
+      <button id="refreshBtn">Refresh</button>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="notes"></div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
