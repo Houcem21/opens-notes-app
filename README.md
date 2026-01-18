@@ -1,255 +1,159 @@
-Notes Application – Project Documentation
-1. Project Overview
+# Notes Application 
+### IT460 – Multi-Container Application Development (OpenShift)
 
-This project is a full-stack Notes application deployed on Red Hat OpenShift.
-It allows users to create, view, and delete notes through a web interface, with data persisted in a MongoDB database.
+---
 
-The application follows a microservice-oriented architecture:
+## Overview
 
-Frontend: static web client
+This project is a multi-container Notes application developed for the IT460 course.  
+The goal was to design, containerize, and deploy a real application on **Red Hat OpenShift**, while understanding how different services interact inside a container orchestration platform.
 
-Backend: REST API built with Node.js and Express
+The application allows users to create, view, and delete notes. All data is stored persistently, meaning notes remain available even after containers or pods are restarted.
 
-Database: MongoDB with persistent storage
+Beyond functionality, the project focuses on learning how OpenShift manages deployments, networking, storage, and scaling in a real environment.
 
-Containerized and deployed using OpenShift resources
+---
 
-2. Architecture Overview
-Components
+## Application Architecture
 
-Frontend
+The application is built following a microservices-style architecture. Each component is deployed independently and communicates through OpenShift-native mechanisms.
 
-Serves the user interface
+User Browser
+|
+v
+Frontend (Route)
+|
+v
+Backend API (Service)
+|
+v
+MongoDB (Service + PersistentVolumeClaim)
 
-Communicates with the backend via HTTP (REST)
+This separation makes the system easier to maintain, debug, and scale.
 
-Backend
+---
 
-Express.js application
+## Components Description
 
-Exposes REST endpoints for notes
+### Frontend
 
-Handles data validation and database access
+The frontend is a static web application responsible for user interaction. It sends HTTP requests to the backend API and displays the returned data.  
+It is exposed externally using an OpenShift Route.
 
-MongoDB
+### Backend
 
-Stores notes persistently
+The backend is a Node.js application built with Express. It exposes a REST API that handles note creation, retrieval, and deletion.  
+The backend is stateless and relies entirely on the database for persistence. Database configuration is provided through environment variables.
 
-Uses a PersistentVolumeClaim (PVC)
+### Database
 
-OpenShift
+MongoDB is used to store notes. It runs as a separate container and uses an OpenShift PersistentVolumeClaim to ensure that data survives pod restarts and redeployments.
 
-Manages containers, services, routes, and storage
+---
 
-Communication Flow
-Browser → Frontend → Backend API → MongoDB
+## Technologies Used
 
-3. Backend Architecture
-Technology Stack
+- Node.js and Express
+- MongoDB with Mongoose
+- Docker
+- Red Hat OpenShift
+- Quay.io container registry
 
-Node.js
+---
 
-Express.js
+## OpenShift Usage
 
-Mongoose (MongoDB ODM)
+The project makes use of several OpenShift features:
 
-CORS middleware
+- Deployments to manage application pods and replicas
+- Services for internal communication between containers
+- Routes to expose the frontend and backend externally
+- PersistentVolumeClaims for database storage
+- Environment variables for runtime configuration
+- Horizontal scaling through multiple backend replicas
 
-Environment Variables
-Variable	Description
-PORT	Port exposed by the backend (default: 8080)
-MONGO_URL	MongoDB connection string
+Standard Kubernetes Deployments were used, as they are fully supported by OpenShift and align with current best practices.
 
-Example:
+---
 
-mongodb://notes-mongo:27017/notesdb
+## Containerization Strategy
 
-4. Backend Code Structure
-Main File
-backend/
- └── index.js
+Each component of the application runs in its own container. Images were built locally using Docker and pushed to Quay.io.  
+All images were built for the `linux/amd64` architecture to match the OpenShift cluster nodes.
 
-Responsibilities of index.js
+Example commands used during development:
 
-Initialize Express application
+```bash
+docker build --platform=linux/amd64 -t quay.io/<username>/notes-backend .
+docker push quay.io/<username>/notes-backend
+```
 
-Connect to MongoDB
+---
 
-Define data schema and model
+## Communication Between Containers
 
-Expose REST API endpoints
+The frontend communicates with the backend using HTTP through an OpenShift Service and Route.
+The backend communicates with MongoDB using TCP through an internal OpenShift Service.
+No IP addresses are hardcoded; service discovery is handled by OpenShift DNS.
 
-Start HTTP server only after DB connection is established
+---
 
-5. Database Model
-Note Schema
-{
-  title: String,      // required
-  content: String,   // required
-  createdAt: Date    // auto-generated
-}
+## Data Persistence
 
+MongoDB uses a PersistentVolumeClaim to store application data.
+This ensures that notes remain available across:
+- Backend pod restarts
+- MongoDB pod restarts
+- Application redeployments
 
-Stored in MongoDB using Mongoose
+Persistence was verified by manually deleting pods and confirming that data remained intact.
 
-_id generated by MongoDB
+---
 
-Converted to id before sending to frontend
+## Testing and Validation
 
-6. API Endpoints
-Health Check
-GET /healthz
+The application was tested in several scenarios:
 
+- Creating, listing, and deleting notes
+- Restarting backend pods
+- Restarting the MongoDB pod
+- Accessing the application in incognito and cache-less browser sessions
+- Inspecting backend logs and health endpoints
 
-Response
+All tests confirmed correct functionality and reliable persistence.
 
-{ "status": "ok" }
+---
 
+## Challenges Encountered
 
-Used by OpenShift for readiness checks.
+Several challenges were encountered during the project:
 
-Get All Notes
-GET /notes
+- Some container images could not be pulled directly due to registry restrictions in the OpenShift free trial.
+- There was initial confusion between Builds, ImageStreams, and Deployments.
+- The PersistentVolumeClaim remained in a Pending state until the first consumer pod was created.
+- Browser caching caused the frontend to call a local API instead of the OpenShift backend route.
+- Registry authentication issues required manual image management.
 
+Each issue was resolved through debugging, experimentation, and consulting OpenShift documentation.
 
-Response
+---
 
-[
-  {
-    "id": "string",
-    "title": "string",
-    "content": "string",
-    "createdAt": "ISO date"
-  }
-]
+## Lessons Learned
 
-Create a Note
-POST /notes
+This project highlighted several important lessons:
 
+- OpenShift enforces stricter security and access rules than local Docker environments.
+- Microservices should be loosely coupled and stateless.
+- Persistence must be explicitly configured using PVCs.
+- Services and internal DNS are essential for container communication.
+- Browser caching can hide deployment configuration issues.
+- Logs and events are critical tools when troubleshooting in OpenShift.
 
-Request Body
+Overall, the project emphasized the importance of understanding the platform, not just the application code.
 
-{
-  "title": "My Note",
-  "content": "Some content"
-}
+---
 
+## Conclusion
 
-Response
-
-{
-  "id": "string",
-  "title": "My Note",
-  "content": "Some content",
-  "createdAt": "ISO date"
-}
-
-Delete a Note
-DELETE /notes/{id}
-
-
-Response
-
-{ "ok": true }
-
-7. Persistence Strategy
-
-MongoDB runs in a container managed by OpenShift
-
-A PersistentVolumeClaim (PVC) ensures data survives pod restarts
-
-Notes remain available even after:
-
-Backend pod deletion
-
-MongoDB pod restart
-
-8. OpenShift Resources Used
-Workloads
-
-Deployments:
-
-notes-frontend
-
-notes-backend
-
-notes-mongo
-
-Networking
-
-Services:
-
-Backend service (notes-backend)
-
-MongoDB service (notes-mongo)
-
-Routes:
-
-Frontend route
-
-Backend route
-
-Storage
-
-PersistentVolumeClaim:
-
-MongoDB data directory
-
-9. Containerization
-
-Docker used locally to build images
-
-Images pushed to Quay.io
-
-Built for linux/amd64 to match OpenShift architecture
-
-Example:
-
-docker build --platform=linux/amd64 -t quay.io/<user>/notes-backend .
-docker push quay.io/<user>/notes-backend
-
-10. Reliability & Fault Tolerance
-
-The system was tested for:
-
-Backend pod restarts
-
-MongoDB pod restarts
-
-Cache-less browser sessions
-
-Multiple replicas running simultaneously
-
-All tests confirmed:
-
-Data persistence
-
-Correct service discovery
-
-Stable API behavior
-
-11. Security & Best Practices
-
-No credentials hardcoded in source code
-
-Database connection handled via environment variables
-
-Containers run without elevated privileges
-
-Stateless backend (except DB access)
-
-12. Conclusion
-
-This project demonstrates:
-
-Containerized application deployment
-
-REST API design
-
-Database persistence with PVCs
-
-Service-to-service communication in OpenShift
-
-End-to-end functionality validation
-
-The application is fully functional, scalable, and suitable for production-style environments.
+This project successfully demonstrates the deployment of a multi-container application on Red Hat OpenShift using microservices principles.
+The final system is functional, persistent, and scalable, and the development process provided valuable hands-on experience with container orchestration and cloud-native application deployment.
