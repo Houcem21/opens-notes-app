@@ -1,7 +1,7 @@
 // frontend/script.js
 
 // Local dev backend:
-const API_BASE = "http://localhost:8080"; 
+const API_BASE = "https://notes-backend-houcem-dmk-dev.apps.rm1.0a51.p1.openshiftapps.com";
 // Later on OpenShift, you'll switch this to the backend Route URL.
 
 const titleEl = document.getElementById("title");
