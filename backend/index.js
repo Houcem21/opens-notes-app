@@ -3,6 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+const treesRouter = require("./routes/trees");
+const nodesRouter = require("./routes/nodes");
+const depsRouter = require("./routes/deps");
+const insightsRouter = require("./routes/insights");
+const importExportRouter = require("./routes/importExport");
+
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -15,6 +22,13 @@ const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/trees", treesRouter);
+app.use(nodesRouter);
+app.use(depsRouter);
+app.use(insightsRouter);
+app.use(importExportRouter);
+
 
 // MongoDB connection (URL provided by OpenShift env var)
 const MONGO_URL = process.env.MONGO_URL;
