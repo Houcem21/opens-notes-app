@@ -157,3 +157,143 @@ Overall, the project emphasized the importance of understanding the platform, no
 
 This project successfully demonstrates the deployment of a multi-container application on Red Hat OpenShift using microservices principles.
 The final system is functional, persistent, and scalable, and the development process provided valuable hands-on experience with container orchestration and cloud-native application deployment.
+
+
+---
+
+
+Local Development (step-by-step)
+1) Clone the repo
+git clone https://github.com/Houcem21/opens-notes-app.git
+cd opens-notes-app
+
+2) Start MongoDB locally (Docker)
+
+If you're on Apple Silicon (arm64), we explicitly set the platform.
+
+docker rm -f local-mongo 2>/dev/null || true
+docker run -d --name local-mongo --platform=linux/arm64 -p 27017:27017 mongo:6
+
+
+Check it's running:
+
+docker ps --filter name=local-mongo
+
+3) Start the backend locally
+
+In a new terminal:
+
+cd backend
+npm install
+export MONGO_URL="mongodb://localhost:27017/treebuilder"
+export PORT=8080
+npm start
+
+
+Health check:
+
+curl -s http://localhost:8080/healthz
+
+4) Run the frontend locally
+
+Option A (simple): open the file directly
+Open frontend/index.html in your browser.
+
+Option B (recommended): serve it with a local static server
+
+cd frontend
+python3 -m http.server 5173
+
+
+Open:
+
+http://localhost:5173
+
+5) Configure API base in the UI
+
+The UI supports two ways:
+
+A) Query param (fast):
+
+http://localhost:5173/?api=http://localhost:8080
+
+
+B) Paste into “API Base URL” input and click “Use API”
+
+API Reference (quick)
+Trees
+
+GET /trees
+
+POST /trees { "name": "Learning" }
+
+GET /trees/:treeId/nodes
+
+GET /trees/:treeId/deps
+
+GET /trees/:treeId/insights
+
+GET /trees/:treeId/export
+
+POST /trees/import (JSON payload from export)
+
+Nodes
+
+POST /nodes { treeId, parentId, title }
+
+PATCH /nodes/:id { status }
+
+DELETE /nodes/:id
+
+Dependencies
+
+POST /deps { treeId, fromNodeId, toNodeId }
+
+Cycle prevention is enforced by the backend.
+
+Example Manual API Test (curl)
+BASE="http://localhost:8080"
+
+# create tree
+TREE=$(curl -s -X POST "$BASE/trees" -H "Content-Type: application/json" -d '{"name":"Learning"}')
+echo "$TREE"
+
+OpenShift Deployment Notes
+Environment variables (backend)
+
+Backend requires:
+
+MONGO_URL (example): mongodb://notes-mongo:27017/treebuilder
+
+OpenShift sets PORT automatically; backend defaults to 8080.
+
+Images (Quay)
+
+quay.io/houcem_dmk/notes-backend:latest
+
+quay.io/houcem_dmk/notes-frontend:latest
+
+quay.io/houcem_dmk/notes-mongo:6 (custom-built if needed)
+
+Typical update flow
+
+When you change code locally:
+
+Commit + push (optional but recommended)
+
+Build amd64 image
+
+Push to Quay
+
+Restart deployment (scale replicas 0 → 1 if no restart button)
+
+Backend:
+
+docker build --platform=linux/amd64 -t quay.io/houcem_dmk/notes-backend:latest ./backend
+docker push quay.io/houcem_dmk/notes-backend:latest
+
+
+Frontend:
+
+docker build --platform=linux/amd64 -t quay.io/houcem_dmk/notes-frontend:latest ./frontend
+docker push quay.io/houcem_dmk/notes-frontend:latest
