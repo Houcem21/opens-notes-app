@@ -129,6 +129,11 @@ router.patch("/nodes/:id", async (req, res) => {
       updates.title = String(updates.title).trim();
     }
 
+    if (updates.notes !== undefined) {
+      if (!String(updates.notes).trim()) return res.status(400).json({ error: "Notes cannot be empty" });
+      updates.notes = String(updates.notes).trim();
+    }
+
     if (updates.parentId !== undefined) {
       // we won't use reparenting in UI yet, but API can support it
       if (updates.parentId === null || updates.parentId === "") {

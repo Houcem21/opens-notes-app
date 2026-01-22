@@ -162,7 +162,10 @@ The final system is functional, persistent, and scalable, and the development pr
 ---
 
 
-Local Development (step-by-step)
+# Local Development (step-by-step)
+
+## Steps
+
 1) Clone the repo
 git clone https://github.com/Houcem21/opens-notes-app.git
 cd opens-notes-app
@@ -196,65 +199,19 @@ curl -s http://localhost:8080/healthz
 
 4) Run the frontend locally
 
-Option A (simple): open the file directly
-Open frontend/index.html in your browser.
-
-Option B (recommended): serve it with a local static server
 
 cd frontend
-python3 -m http.server 5173
+nvm use 20
+npm i
+npm run dev
 
 
 Open:
 
 http://localhost:5173
 
-5) Configure API base in the UI
+## Create tree
 
-The UI supports two ways:
-
-A) Query param (fast):
-
-http://localhost:5173/?api=http://localhost:8080
-
-
-B) Paste into “API Base URL” input and click “Use API”
-
-API Reference (quick)
-Trees
-
-GET /trees
-
-POST /trees { "name": "Learning" }
-
-GET /trees/:treeId/nodes
-
-GET /trees/:treeId/deps
-
-GET /trees/:treeId/insights
-
-GET /trees/:treeId/export
-
-POST /trees/import (JSON payload from export)
-
-Nodes
-
-POST /nodes { treeId, parentId, title }
-
-PATCH /nodes/:id { status }
-
-DELETE /nodes/:id
-
-Dependencies
-
-POST /deps { treeId, fromNodeId, toNodeId }
-
-Cycle prevention is enforced by the backend.
-
-Example Manual API Test (curl)
-BASE="http://localhost:8080"
-
-# create tree
 TREE=$(curl -s -X POST "$BASE/trees" -H "Content-Type: application/json" -d '{"name":"Learning"}')
 echo "$TREE"
 
@@ -262,7 +219,6 @@ OpenShift Deployment Notes
 Environment variables (backend)
 
 Backend requires:
-
 MONGO_URL (example): mongodb://notes-mongo:27017/treebuilder
 
 OpenShift sets PORT automatically; backend defaults to 8080.
@@ -275,16 +231,12 @@ quay.io/houcem_dmk/notes-frontend:latest
 
 quay.io/houcem_dmk/notes-mongo:6 (custom-built if needed)
 
-Typical update flow
+## Typical update flow
 
 When you change code locally:
-
 Commit + push (optional but recommended)
-
 Build amd64 image
-
 Push to Quay
-
 Restart deployment (scale replicas 0 → 1 if no restart button)
 
 Backend:
