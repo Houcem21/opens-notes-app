@@ -8,13 +8,10 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# 2) Serve it with nginx (unprivileged) on 8080
+# 2) Serve with nginx (unprivileged) on 8080
 FROM nginxinc/nginx-unprivileged:stable-alpine
 
-# Clean default nginx html
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy the build output
-COPY --from=build /app/dist /usr/share/nginx/html
+# Overwrite nginx html with the build output (no rm needed)
+COPY --from=build --chown=101:101 /app/dist/ /usr/share/nginx/html/
 
 EXPOSE 8080
