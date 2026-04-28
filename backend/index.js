@@ -5,6 +5,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+// Middleware
+const adminAuth = require("./middleware/adminAuth");
+
 // Notes
 const treesRouter = require("./features/notes/routes/trees");
 const nodesRouter = require("./features/notes/routes/nodes");

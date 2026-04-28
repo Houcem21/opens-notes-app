@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 
+// Middleware
+const adminAuth = require("../../../middleware/adminAuth");
+
 // helper: slug generator
 function slugify(text) {
   return text
@@ -25,7 +28,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /posts/admin → alle posts
-router.get("/admin", async (req, res) => {
+router.get("/admin", adminAuth, async (req, res) => {
   try {
     const posts = await Post.find().sort({ createdAt: -1 }).lean();
     res.json(posts);
@@ -51,7 +54,7 @@ router.get("/:slug", async (req, res) => {
 });
 
 // POST /posts
-router.post("/", async (req, res) => {
+router.post("/", adminAuth, async (req, res) => {
   try {
     const { title, content, summary, category, status } = req.body;
 
@@ -77,7 +80,7 @@ router.post("/", async (req, res) => {
 });
 
 // PATCH /posts/:id
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", adminAuth, async (req, res) => {
   try {
     const update = { ...req.body };
 
@@ -100,7 +103,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // DELETE /posts/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminAuth, async (req, res) => {
   try {
     await Post.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
