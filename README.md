@@ -1,5 +1,5 @@
-# Notes Application 
-### IT460 – Multi-Container Application Development (OpenShift)
+# Internal CRM
+### Useful tool for organizing company info
 
 ---
 
@@ -46,15 +46,6 @@ Supabase
 
 ## Testing and Validation
 
-The application was tested in several scenarios:
-
-- Creating, listing, and deleting notes
-- Restarting backend pods
-- Restarting the MongoDB pod
-- Accessing the application in incognito and cache-less browser sessions
-- Inspecting backend logs and health endpoints
-
-All tests confirmed correct functionality and reliable persistence.
 
 ---
 
