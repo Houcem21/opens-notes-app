@@ -5,12 +5,15 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-const treesRouter = require("./routes/trees");
-const nodesRouter = require("./routes/nodes");
-const depsRouter = require("./routes/deps");
-const insightsRouter = require("./routes/insights");
-const importExportRouter = require("./routes/importExport");
+// Notes
+const treesRouter = require("./features/notes/routes/trees");
+const nodesRouter = require("./features/notes/routes/nodes");
+const depsRouter = require("./features/notes/routes/deps");
+const insightsRouter = require("./features/notes/routes/insights");
+const importExportRouter = require("./features/notes/routes/importExport");
 
+// CMS
+const postsRouter = require("./features/cms/routes/posts");
 
 const app = express();
 
@@ -31,6 +34,8 @@ app.use(depsRouter);
 app.use(insightsRouter);
 app.use(importExportRouter);
 
+// CMS
+app.use("/posts", postsRouter);
 
 // MongoDB connection (URL provided by OpenShift env var)
 const MONGO_URL = process.env.MONGO_URL;

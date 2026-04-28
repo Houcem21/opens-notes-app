@@ -14,9 +14,12 @@ import "reactflow/dist/style.css";
 
 import NodeEditorModal from "./NodeEditorModal";
 import BlockNode from "./BlockNode";
-import { apiFetch } from "../api/client";
+import { apiFetch } from "../../../api/client";
 
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
+
+
+import "../styles/notes.css"
 
 function rectOfNode(n) {
     const w = n.width || 180;
