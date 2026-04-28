@@ -14,7 +14,7 @@ import "reactflow/dist/style.css";
 
 import NodeEditorModal from "./NodeEditorModal";
 import BlockNode from "./BlockNode";
-import { apiFetch } from "../../../api/client";
+import { notesApi } from "../../../api/notes";
 
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 
@@ -59,7 +59,7 @@ function TreeCanvasInner() {
     [nodes, activeNodeId]
   );
 
-  // ✅ Now this is safe because we're inside ReactFlowProvider
+  // Now this is safe because we're inside ReactFlowProvider
   const { getIntersectingNodes } = useReactFlow();
 
   const nodesRef = useRef([]);
@@ -67,7 +67,7 @@ function TreeCanvasInner() {
     nodesRef.current = nodes;
   }, [nodes]);
 
-  // ✅ Build edges purely from parentId (stable and deterministic)
+  // Build edges purely from parentId (stable and deterministic)
   useEffect(() => {
     const nextEdges = nodes
       .filter((n) => n.data?.parentId)
@@ -83,27 +83,22 @@ function TreeCanvasInner() {
 
   // ---- API helpers ----
   async function ensureTreeAndRoot() {
-    const trees = await apiFetch("/trees");
+    const trees = await notesApi.getTrees();
     let t = trees?.[0];
 
     if (!t) {
-      t = await apiFetch("/trees", {
-        method: "POST",
-        body: JSON.stringify({ name: "Learning" }),
-      });
+      t = await notesApi.createTree({ name: "Learning" });
     }
 
-    const ns = await apiFetch(`/trees/${t.id}/nodes`);
+    const ns = await notesApi.getNodes(t.id);
 
     if (!Array.isArray(ns) || ns.length === 0) {
-      const root = await apiFetch("/nodes", {
-        method: "POST",
-        body: JSON.stringify({
-          treeId: t.id,
-          parentId: null,
-          title: t.name || "Root",
-        }),
+      const root = await notesApi.createNode({
+        treeId: t.id,
+        parentId: null,
+        title: t.name || "Root",
       });
+
       return { tree: t, nodes: [root] };
     }
 
@@ -153,20 +148,14 @@ function TreeCanvasInner() {
       const baseX = parent?.position?.x ?? 0;
       const baseY = parent?.position?.y ?? 0;
 
-      const created = await apiFetch("/nodes", {
-        method: "POST",
-        body: JSON.stringify({
-          treeId: tree.id,
-          parentId,
-          title: "New",
-        }),
+      const created = await notesApi.createNode({
+        treeId: tree.id,
+        parentId,
+        title: "New",
       });
 
       const newPos = { x: baseX + 240, y: baseY + 120 };
-      await apiFetch(`/nodes/${created.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ pos: newPos }),
-      });
+      await notesApi.updateNode(created.id, { pos: newPos });
 
       setNodes((prev) => [
         ...prev,
@@ -198,10 +187,7 @@ function TreeCanvasInner() {
       if (!activeNodeId) return;
 
       // persist to backend
-      await apiFetch(`/nodes/${activeNodeId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ title, notes }),
-      });
+      await notesApi.updateNode(activeNodeId, { title, notes });
 
       // update UI state
       setNodes((prev) =>
@@ -222,7 +208,7 @@ function TreeCanvasInner() {
       if (!tree) return;
       if (!confirm("Delete this node? (children may become orphaned)")) return;
 
-      await apiFetch(`/nodes/${id}`, { method: "DELETE" });
+      await notesApi.deleteNode(id);
 
       setNodes((prev) => prev.filter((n) => n.id !== id));
       setEdges((prev) => prev.filter((e) => e.source !== id && e.target !== id));
@@ -232,10 +218,7 @@ function TreeCanvasInner() {
 
   const onRename = useCallback(
     async (id, title) => {
-      await apiFetch(`/nodes/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ title }),
-      });
+      await notesApi.updateNode(id, { title });
 
       setNodes((prev) =>
         prev.map((n) =>
@@ -261,10 +244,7 @@ function TreeCanvasInner() {
   // ---- Drag stop: persist pos, re-parent ONLY if actually dropped onto a node ----
   const onNodeDragStop = useCallback(
     async (evt, dragged) => {
-      await apiFetch(`/nodes/${dragged.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ pos: dragged.position }),
-      });
+      await notesApi.updateNode(dragged.id, { pos: dragged.position });
 
       const intersections = getIntersectingNodes(dragged).filter(
         (n) => n.id !== dragged.id
@@ -277,10 +257,7 @@ function TreeCanvasInner() {
 
       const newParentId = target.id;
 
-      await apiFetch(`/nodes/${dragged.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ parentId: newParentId }),
-      });
+      await notesApi.updateNode(dragged.id, { parentId: newParentId });
 
       setNodes((prev) =>
         prev.map((n) =>
