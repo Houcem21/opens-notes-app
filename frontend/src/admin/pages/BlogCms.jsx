@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { postsApi } from "../../api/posts";
 import ErrorMessage from "../../common/components/ErrorMessage"
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
+import { saveAdminCredentials } from "../../api/client";
 
 import "../styles/admin.css";
 export default function BlogCms() {
@@ -12,16 +13,35 @@ export default function BlogCms() {
 
   const selectedPost = posts.find((post) => post._id === selectedPostId);
 
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [loginForm, setLoginForm] = useState({
+    username: "",
+    password: "",
+  });
+
   async function loadPosts() {
     try {
       setError("");
       const data = await postsApi.getAdminPosts();
       setPosts(data);
+      setNeedsLogin(false);
     } catch (err) {
+      if (err.status === 401) {
+        setNeedsLogin(true);
+        setError("");
+        return;
+      }
+
       setError(err.message);
     }
   }
+  async function handleLogin(e) {
+    e.preventDefault();
 
+    saveAdminCredentials(loginForm.username, loginForm.password);
+
+    await loadPosts();
+  }
   useEffect(() => {
     loadPosts();
   }, []);
@@ -70,6 +90,45 @@ export default function BlogCms() {
     } catch (err) {
       setError(err.message);
     }
+  }
+
+  if (needsLogin) {
+    return (
+      <div className="adminLoginPage">
+        <form className="adminLoginCard" onSubmit={handleLogin}>
+          <h1>Admin Login</h1>
+
+          <label className="formLabel">Username</label>
+          <input
+            className="formInput"
+            value={loginForm.username}
+            onChange={(e) =>
+              setLoginForm((current) => ({
+                ...current,
+                username: e.target.value,
+              }))
+            }
+          />
+
+          <label className="formLabel">Password</label>
+          <input
+            className="formInput"
+            type="password"
+            value={loginForm.password}
+            onChange={(e) =>
+              setLoginForm((current) => ({
+                ...current,
+                password: e.target.value,
+              }))
+            }
+          />
+
+          <button type="submit">Login</button>
+
+          <ErrorMessage message={error} />
+        </form>
+      </div>
+    );
   }
 
   return (
