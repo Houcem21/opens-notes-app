@@ -1,0 +1,16 @@
+.formLabel {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.formInput,
+.formTextarea,
+.formSelect {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font: inherit;
+}
