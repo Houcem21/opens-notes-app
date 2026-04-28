@@ -16,16 +16,16 @@ export default function App() {
       <nav className="appNav">
         <Link to="/">Home</Link>
         <Link to="/blog">Blog</Link>
-        <Link to="/admin/blog">CMS Admin</Link>
         <Link to="/notes">Notes</Link>
+        <Link to="/admin/blog">CMS Admin</Link>
       </nav>
 
       <main className="appMain">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/admin/blog" element={<BlogCms />} />
           <Route path="/notes" element={<NotesPage />} />
+          <Route path="/admin/blog" element={<BlogCms />} />
         </Routes>
       </main>
     </div>

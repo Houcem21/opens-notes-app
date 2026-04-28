@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { postsApi } from "../../api/posts";
 import ErrorMessage from "../../common/components/ErrorMessage"
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
-import { saveAdminCredentials } from "../../api/client";
+import { supabase } from "../../api/supabase";
 
 import "../styles/admin.css";
 export default function BlogCms() {
@@ -22,26 +22,45 @@ export default function BlogCms() {
   async function loadPosts() {
     try {
       setError("");
+
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (!sessionData.session) {
+        setNeedsLogin(true);
+        return;
+      }
+
       const data = await postsApi.getAdminPosts();
       setPosts(data);
       setNeedsLogin(false);
     } catch (err) {
-      if (err.status === 401) {
-        setNeedsLogin(true);
-        setError("");
-        return;
-      }
-
+      setNeedsLogin(true);
       setError(err.message);
     }
   }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    setPosts([]);
+    setNeedsLogin(true);
+  }
+
   async function handleLogin(e) {
     e.preventDefault();
 
-    saveAdminCredentials(loginForm.username, loginForm.password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginForm.username,
+      password: loginForm.password,
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
 
     await loadPosts();
   }
+
   useEffect(() => {
     loadPosts();
   }, []);
@@ -98,7 +117,7 @@ export default function BlogCms() {
         <form className="adminLoginCard" onSubmit={handleLogin}>
           <h1>Admin Login</h1>
 
-          <label className="formLabel">Username</label>
+          <label className="formLabel">Email</label>
           <input
             className="formInput"
             value={loginForm.username}
@@ -137,6 +156,7 @@ export default function BlogCms() {
         <div className="cmsHeader">
           <h2>Blog CMS</h2>
           <button onClick={startNewPost}>Neu</button>
+          <button onClick={handleLogout}>Logout</button>
         </div>
 
         {posts.map((post) => (
