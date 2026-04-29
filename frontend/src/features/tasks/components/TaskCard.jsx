@@ -62,8 +62,8 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
         </select>
 
         <div className="taskCardActions">
-          <button onClick={saveChanges}>Save</button>
-          <button onClick={() => setEditing(false)}>Cancel</button>
+          <button className="btn" onClick={saveChanges}>Save</button>
+          <button className="btn btnSecondary" onClick={() => setEditing(false)}>Cancel</button>
         </div>
       </div>
     );
@@ -77,7 +77,7 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
     >
       <div className="taskCardTop">
         <span className="priorityBadge">{task.priority}</span>
-        <button onClick={() => setEditing(true)}>Edit</button>
+        <button className="btn btnSecondary" onClick={() => setEditing(true)}>Edit</button>
       </div>
 
       <h3>{task.title}</h3>
@@ -88,7 +88,7 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
 
       <div className="taskCardFooter">
         {task.dueDate && <span>{task.dueDate}</span>}
-        <button className="deleteTaskButton" onClick={() => onDelete(task.id)}>
+        <button className="btn btnDanger" onClick={() => onDelete(task.id)}>
           Delete
         </button>
       </div>

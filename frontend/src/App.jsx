@@ -11,8 +11,6 @@ import TasksPage from "./features/tasks/pages/TasksPage"
 // Header
 import Header from "./common/components/navigation/Header";
 
-// Some styling
-import "./App.css";
 
 export default function App() {
   return (
@@ -24,7 +22,7 @@ export default function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/admin/blog" element={<BlogCms />} />
+          <Route path="/admin" element={<BlogCms />} />
         </Routes>
       </main>
     </div>

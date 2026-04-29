@@ -4,10 +4,12 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.jsx";
 
+import "./styles/reset.css";
+import "./styles/tokens.css";
+import "./styles/layout.css";
+import "./styles/components.css";
+import "./styles/utilities.css";
 import "./index.css";
-import "./common/styles/global.css";
-import "./common/styles/forms.css";
-import "./common/styles/layout.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

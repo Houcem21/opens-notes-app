@@ -69,7 +69,7 @@ export default function TaskColumn({
             placeholder="New task..."
             onChange={(e) => setNewTaskTitle(e.target.value)}
           />
-          <button type="submit">Add</button>
+          <button className="btn" type="submit">Add</button>
         </form>
       )}
     </section>

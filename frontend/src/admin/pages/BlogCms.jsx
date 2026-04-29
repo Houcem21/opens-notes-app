@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { postsApi } from "../../api/posts";
 import ErrorMessage from "../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
-import { supabase } from "../../api/supabase";
+import { useSupabaseAuth } from "../../common/hooks/useSupabaseAuth"
 import RichTextEditor from "../components/editor/RichTextEditor";
+
+import AuthForm from "../../common/components/AuthForm";
 
 import "../styles/admin.css";
 
@@ -13,58 +15,43 @@ export default function BlogCms() {
   const [form, setForm] = useState(createEmptyPostForm());
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
-  const [needsLogin, setNeedsLogin] = useState(false);
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
 
   const selectedPost = posts.find((post) => post._id === selectedPostId);
   const activePage = form.pages?.[activePageIndex];
+
+  const { isLoggedIn, authLoading, login, logout } = useSupabaseAuth();
 
   async function loadPosts() {
     try {
       setError("");
 
-      const { data: sessionData } = await supabase.auth.getSession();
-
-      if (!sessionData.session) {
-        setNeedsLogin(true);
-        return;
-      }
+      if (!isLoggedIn) return;
 
       const data = await postsApi.getAdminPosts();
       setPosts(data);
-      setNeedsLogin(false);
     } catch (err) {
-      setNeedsLogin(true);
       setError(err.message);
     }
   }
 
   useEffect(() => {
     loadPosts();
-  }, []);
+  }, [isLoggedIn]);
 
-  async function handleLogin(e) {
-    e.preventDefault();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginForm.username,
-      password: loginForm.password,
-    });
-
-    if (error) {
-      setError(error.message);
-      return;
+  async function handleLogin(credentials) {
+    try {
+      setError("");
+      await login(credentials);
+    } catch (err) {
+      setError(err.message);
     }
-
-    await loadPosts();
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await logout();
     setPosts([]);
     setSelectedPostId(null);
     setForm(createEmptyPostForm());
-    setNeedsLogin(true);
   }
 
   function selectPost(post) {
@@ -173,44 +160,19 @@ export default function BlogCms() {
     }
   }
 
-  if (needsLogin) {
-    return (
-      <div className="adminLoginPage">
-        <form className="adminLoginCard" onSubmit={handleLogin}>
-          <h1>Admin Login</h1>
-
-          <label className="formLabel">Email</label>
-          <input
-            className="formInput"
-            value={loginForm.username}
-            onChange={(e) =>
-              setLoginForm((current) => ({
-                ...current,
-                username: e.target.value,
-              }))
-            }
-          />
-
-          <label className="formLabel">Password</label>
-          <input
-            className="formInput"
-            type="password"
-            value={loginForm.password}
-            onChange={(e) =>
-              setLoginForm((current) => ({
-                ...current,
-                password: e.target.value,
-              }))
-            }
-          />
-
-          <button type="submit">Login</button>
-          <ErrorMessage message={error} />
-        </form>
-      </div>
-    );
+  if (authLoading) {
+    return <div className="page">Loading...</div>;
   }
 
+  if (!isLoggedIn) {
+    return (
+      <AuthForm
+        title="Admin Login"
+        error={error}
+        onSubmit={handleLogin}
+      />
+    );
+  }
   return (
     <div className="editorShell">
       <aside className="postQueue">
@@ -234,7 +196,7 @@ export default function BlogCms() {
           ))}
         </div>
 
-        <button className="logoutButton" onClick={handleLogout}>
+        <button className="btn btnSecondary" onClick={handleLogout}>
           Logout
         </button>
       </aside>
@@ -269,7 +231,7 @@ export default function BlogCms() {
             ))}
           </div>
 
-          <button className="addPageButton" onClick={addPage}>
+          <button className="btn" onClick={addPage}>
             + Page
           </button>
         </div>
@@ -313,16 +275,16 @@ export default function BlogCms() {
 
         <div className="settingsDivider" />
 
-        <button className="saveButton" onClick={savePost}>
+        <button className="btn" onClick={savePost}>
           Save post
         </button>
 
-        <button className="deletePageButton" onClick={deleteActivePage}>
+        <button className="btn btnDanger" onClick={deleteActivePage}>
           Delete current page
         </button>
 
         {selectedPost && (
-          <button className="dangerButton" onClick={deletePost}>
+          <button className="btn btnDanger" onClick={deletePost}>
             Delete post
           </button>
         )}

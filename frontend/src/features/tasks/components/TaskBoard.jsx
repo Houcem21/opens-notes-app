@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { tasksApi } from "../../../api/tasks";
-import { supabase } from "../../../api/supabase";
+import { useSupabaseAuth } from "../../../common/hooks/useSupabaseAuth";
 import ErrorMessage from "../../../common/components/ErrorMessage";
 import TaskColumn from "./TaskColumn";
+
+import AuthForm from "../../../common/components/AuthForm";
 
 const DEFAULT_COLUMNS = ["To Do", "In Progress", "Done"];
 
@@ -10,9 +12,9 @@ export default function TaskBoard() {
     const [board, setBoard] = useState(null);
     const [columns, setColumns] = useState([]);
     const [tasks, setTasks] = useState([]);
-    const [needsLogin, setNeedsLogin] = useState(false);
-    const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
+
+    const { isLoggedIn, authLoading, login, logout } = useSupabaseAuth();
 
     const tasksByColumn = useMemo(() => {
         return columns.reduce((acc, column) => {
@@ -55,48 +57,34 @@ export default function TaskBoard() {
 
     async function loadBoard() {
         try {
-        setError("");
+            setError("");
 
-        const { data } = await supabase.auth.getSession();
+            if (!isLoggedIn) return;
 
-        if (!data.session) {
-            setNeedsLogin(true);
-            return;
-        }
-
-        await ensureBoard();
-        setNeedsLogin(false);
+            await ensureBoard();
         } catch (err) {
-        setError(err.message);
+            setError(err.message);
         }
     }
 
     useEffect(() => {
         loadBoard();
-    }, []);
+    }, [isLoggedIn]);
 
-    async function handleLogin(e) {
-        e.preventDefault();
-
-        const { error } = await supabase.auth.signInWithPassword({
-        email: loginForm.email,
-        password: loginForm.password,
-        });
-
-        if (error) {
-        setError(error.message);
-        return;
+    async function handleLogin(credentials) {
+        try {
+            setError("");
+            await login(credentials);
+        } catch (err) {
+            setError(err.message);
         }
-
-        await loadBoard();
     }
 
     async function handleLogout() {
-        await supabase.auth.signOut();
+        await logout();
         setBoard(null);
         setColumns([]);
         setTasks([]);
-        setNeedsLogin(true);
     }
 
     async function createTask(columnId, title) {
@@ -148,41 +136,17 @@ export default function TaskBoard() {
         setTasks((current) => current.filter((task) => task.id !== taskId));
     }
 
-    if (needsLogin) {
+    if (authLoading) {
+        return <div className="page">Loading...</div>;
+    }
+
+    if (!isLoggedIn) {
         return (
-        <div className="tasksLoginPage">
-            <form className="tasksLoginCard" onSubmit={handleLogin}>
-            <h1>Tasks Login</h1>
-
-            <label className="formLabel">Email</label>
-            <input
-                className="formInput"
-                value={loginForm.email}
-                onChange={(e) =>
-                setLoginForm((current) => ({
-                    ...current,
-                    email: e.target.value,
-                }))
-                }
+            <AuthForm
+            title="Tasks Login"
+            error={error}
+            onSubmit={handleLogin}
             />
-
-            <label className="formLabel">Password</label>
-            <input
-                className="formInput"
-                type="password"
-                value={loginForm.password}
-                onChange={(e) =>
-                setLoginForm((current) => ({
-                    ...current,
-                    password: e.target.value,
-                }))
-                }
-            />
-
-            <button type="submit">Login</button>
-            <ErrorMessage message={error} />
-            </form>
-        </div>
         );
     }
 
@@ -194,7 +158,12 @@ export default function TaskBoard() {
             <p>Simple internal task board</p>
             </div>
 
-            <button onClick={handleLogout}>Logout</button>
+            <button 
+                onClick={handleLogout}
+                className="btn btnSecondary"
+            >
+                Logout
+            </button>
         </header>
 
         <ErrorMessage message={error} />
