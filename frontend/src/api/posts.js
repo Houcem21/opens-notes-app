@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { timestampsFrom } from "../common/utils/dateMapping";
 
 function slugify(text) {
   return text
@@ -24,8 +25,7 @@ function normalizePost(post) {
   return {
     ...post,
     _id: post.id,
-    createdAt: post.created_at,
-    updatedAt: post.updated_at,
+    ...timestampsFrom(post),
     pages: normalizePages(post),
   };
 }

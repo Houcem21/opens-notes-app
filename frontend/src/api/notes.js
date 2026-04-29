@@ -1,11 +1,10 @@
 import { supabase } from "./supabase";
+import { timestampsFrom } from "../common/utils/dateMapping";
 
 function normalizeTree(tree) {
   return {
     ...tree,
-    id: tree.id,
-    createdAt: tree.created_at,
-    updatedAt: tree.updated_at,
+    ...timestampsFrom(tree),
   };
 }
 
@@ -15,8 +14,7 @@ function normalizeNode(node) {
     id: node.id,
     treeId: node.tree_id,
     parentId: node.parent_id,
-    createdAt: node.created_at,
-    updatedAt: node.updated_at,
+    ...timestampsFrom(node),
     pos: {
       x: Number(node.pos_x || 0),
       y: Number(node.pos_y || 0),
@@ -31,8 +29,7 @@ function normalizeDependency(dep) {
     treeId: dep.tree_id,
     fromNodeId: dep.from_node_id,
     toNodeId: dep.to_node_id,
-    createdAt: dep.created_at,
-    updatedAt: dep.updated_at,
+    ...timestampsFrom(dep),
   };
 }
 

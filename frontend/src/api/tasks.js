@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { timestampsFrom } from "../common/utils/dateMapping";
 
 function normalizeBoard(board) {
   return {
@@ -6,8 +7,7 @@ function normalizeBoard(board) {
     id: board.id,
     title: board.title,
     ownerId: board.owner_id,
-    createdAt: board.created_at,
-    updatedAt: board.updated_at,
+    ...timestampsFrom(board),
   };
 }
 
@@ -18,8 +18,7 @@ function normalizeColumn(column) {
     boardId: column.board_id,
     title: column.title,
     position: column.position,
-    createdAt: column.created_at,
-    updatedAt: column.updated_at,
+    ...timestampsFrom(column),
   };
 }
 
@@ -34,8 +33,7 @@ function normalizeTask(task) {
     priority: task.priority || "medium",
     position: task.position,
     dueDate: task.due_date,
-    createdAt: task.created_at,
-    updatedAt: task.updated_at,
+    ...timestampsFrom(task),
   };
 }
 
