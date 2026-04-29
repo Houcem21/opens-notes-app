@@ -5,11 +5,9 @@
 
 ## Overview
 
-
 ---
 
 ## Application Architecture
-
 
 ---
 
@@ -35,15 +33,6 @@ Supabase
 
 ---
 
-## Communication Between Containers
-
-
----
-
-## Data Persistence
-
----
-
 ## Testing and Validation
 
 
@@ -64,7 +53,6 @@ Check it's running:
 
 3) Run the frontend locally
 
-
 cd frontend
 nvm use 20
 npm i
@@ -81,3 +69,15 @@ http://localhost:5173
 When you change code locally:
 Commit + push (optional but recommended)
 
+---
+
+# TO DO
+
+Refactor these files:
+src/api/posts.js
+src/api/notes.js
+src/api/tasks.js
+src/api/storage.js
+to use requireOk, requireData instead of "const { data, error }"
+
+Continue refactoring
