@@ -1,11 +1,19 @@
+export const emptyPostPage = {
+  title: "Page 1",
+  content: "",
+};
+
 export const emptyPostForm = {
   title: "",
   summary: "",
   category: "general",
-  content: "",
   status: "draft",
+  pages: [emptyPostPage],
 };
 
 export function createEmptyPostForm() {
-  return { ...emptyPostForm };
+  return {
+    ...emptyPostForm,
+    pages: [{ ...emptyPostPage }],
+  };
 }

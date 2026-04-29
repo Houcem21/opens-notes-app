@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
 import { postsApi } from "../../api/posts";
-import ErrorMessage from "../../common/components/ErrorMessage"
+import ErrorMessage from "../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
 import { supabase } from "../../api/supabase";
+import RichTextEditor from "../components/editor/RichTextEditor";
 
 import "../styles/admin.css";
+
 export default function BlogCms() {
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [form, setForm] = useState(createEmptyPostForm());
+  const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
 
   const selectedPost = posts.find((post) => post._id === selectedPostId);
-
-  const [needsLogin, setNeedsLogin] = useState(false);
-  const [loginForm, setLoginForm] = useState({
-    username: "",
-    password: "",
-  });
+  const activePage = form.pages?.[activePageIndex];
 
   async function loadPosts() {
     try {
@@ -39,11 +39,9 @@ export default function BlogCms() {
     }
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    setPosts([]);
-    setNeedsLogin(true);
-  }
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -61,18 +59,78 @@ export default function BlogCms() {
     await loadPosts();
   }
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    setPosts([]);
+    setSelectedPostId(null);
+    setForm(createEmptyPostForm());
+    setNeedsLogin(true);
+  }
 
   function selectPost(post) {
     setSelectedPostId(post._id);
-    setForm({...post} || createEmptyPostForm());
+    setForm({
+      title: post.title || "",
+      summary: post.summary || "",
+      category: post.category || "general",
+      status: post.status || "draft",
+      pages:
+        Array.isArray(post.pages) && post.pages.length > 0
+          ? post.pages
+          : [{ title: "Page 1", content: post.content || "" }],
+    });
+    setActivePageIndex(0);
   }
 
   function startNewPost() {
     setSelectedPostId(null);
     setForm(createEmptyPostForm());
+    setActivePageIndex(0);
+    setError("");
+  }
+
+  function updateField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateActivePage(field, value) {
+    setForm((current) => {
+      const pages = [...current.pages];
+      pages[activePageIndex] = {
+        ...pages[activePageIndex],
+        [field]: value,
+      };
+
+      return { ...current, pages };
+    });
+  }
+
+  function addPage() {
+    setForm((current) => {
+      const pageNumber = current.pages.length + 1;
+      const pages = [
+        ...current.pages,
+        { title: `Page ${pageNumber}`, content: "" },
+      ];
+
+      setActivePageIndex(pages.length - 1);
+      return { ...current, pages };
+    });
+  }
+
+  function deleteActivePage() {
+    if (form.pages.length === 1) {
+      setError("Ein Beitrag braucht mindestens eine Seite.");
+      return;
+    }
+
+    if (!confirm("Diese Seite löschen?")) return;
+
+    setForm((current) => {
+      const pages = current.pages.filter((_, index) => index !== activePageIndex);
+      setActivePageIndex(Math.max(0, activePageIndex - 1));
+      return { ...current, pages };
+    });
   }
 
   async function savePost() {
@@ -84,14 +142,18 @@ export default function BlogCms() {
         return;
       }
 
+      if (!form.pages || form.pages.length === 0) {
+        setError("Mindestens eine Seite ist erforderlich.");
+        return;
+      }
+
       if (selectedPost) {
-        await postsApi.updatePost(selectedPost._id, form)
+        await postsApi.updatePost(selectedPost._id, form);
       } else {
         await postsApi.createPost(form);
       }
 
       await loadPosts();
-      startNewPost();
     } catch (err) {
       setError(err.message);
     }
@@ -99,7 +161,7 @@ export default function BlogCms() {
 
   async function deletePost() {
     if (!selectedPost) return;
-    if (!confirm("Diesen Post löschen?")) return;
+    if (!confirm("Diesen Beitrag löschen?")) return;
 
     try {
       setError("");
@@ -143,7 +205,6 @@ export default function BlogCms() {
           />
 
           <button type="submit">Login</button>
-
           <ErrorMessage message={error} />
         </form>
       </div>
@@ -151,92 +212,121 @@ export default function BlogCms() {
   }
 
   return (
-    <div className="cmsPage">
-      <aside className="cmsSidebar">
-        <div className="cmsHeader">
-          <h2>Blog CMS</h2>
-          <button onClick={startNewPost}>Neu</button>
-          <button onClick={handleLogout}>Logout</button>
+    <div className="editorShell">
+      <aside className="postQueue">
+        <div className="postQueueHeader">
+          <h2>Posts</h2>
+          <button onClick={startNewPost}>New</button>
         </div>
 
-        {posts.map((post) => (
-          <button
-            key={post._id}
-            className={`postListItem ${
-              post._id === selectedPostId ? "active" : ""
-            }`}
-            onClick={() => selectPost(post)}
-          >
-            <strong>{post.title}</strong>
-            <span>{post.status}</span>
-          </button>
-        ))}
+        <div className="postQueueList">
+          {posts.map((post) => (
+            <button
+              key={post._id}
+              className={`postQueueItem ${
+                post._id === selectedPostId ? "active" : ""
+              }`}
+              onClick={() => selectPost(post)}
+            >
+              <strong>{post.title}</strong>
+              <span>{post.status}</span>
+            </button>
+          ))}
+        </div>
+
+        <button className="logoutButton" onClick={handleLogout}>
+          Logout
+        </button>
       </aside>
 
-      <section className="cmsEditor">
-        <h1>{selectedPost ? "Post bearbeiten" : "Neuen Post erstellen"}</h1>
-
+      <main className="documentEditor">
         <ErrorMessage message={error} />
 
-        <label htmlFor="titleInput" className="formLabel">Titel</label>
         <input
-          id="titleInput"
-          className="formInput"
+          className="documentTitle"
           value={form.title}
-          onChange={(e) =>
-            setForm((current) => ({ ...current, title: e.target.value }))
-          }
+          placeholder="Untitled post"
+          onChange={(e) => updateField("title", e.target.value)}
         />
 
-        <label className="formLabel">Zusammenfassung (summary)</label>
-        <input
-          className="formInput"
+        <textarea
+          className="documentSummary"
           value={form.summary}
-          onChange={(e) =>
-            setForm((current) => ({ ...current, summary: e.target.value }))
-          }
+          placeholder="Short summary..."
+          onChange={(e) => updateField("summary", e.target.value)}
         />
 
-        <label className="formLabel">Kategorie (category)</label>
-        <input
-          className="formInput"
-          value={form.category}
-          onChange={(e) =>
-            setForm((current) => ({ ...current, category: e.target.value }))
-          }
-        />
+        <div className="pageBar">
+          <div className="pageTabs">
+            {form.pages.map((page, index) => (
+              <button
+                key={index}
+                className={`pageTab ${index === activePageIndex ? "active" : ""}`}
+                onClick={() => setActivePageIndex(index)}
+              >
+                {page.title || `Page ${index + 1}`}
+              </button>
+            ))}
+          </div>
 
-        <label className="formLabel">Status</label>
+          <button className="addPageButton" onClick={addPage}>
+            + Page
+          </button>
+        </div>
+
+        {activePage && (
+          <section className="pageDocument">
+            <input
+              className="pageTitleInput"
+              value={activePage.title}
+              placeholder="Page title"
+              onChange={(e) => updateActivePage("title", e.target.value)}
+            />
+
+            <RichTextEditor
+              value={activePage.content}
+              onChange={(html) => updateActivePage("content", html)}
+            />
+          </section>
+        )}
+      </main>
+
+      <aside className="editorSettings">
+        <h2>Settings</h2>
+
+        <label className="settingsLabel">Status</label>
         <select
-          className="formSelect"
+          className="settingsInput"
           value={form.status}
-          onChange={(e) =>
-            setForm((current) => ({ ...current, status: e.target.value }))
-          }
+          onChange={(e) => updateField("status", e.target.value)}
         >
           <option value="draft">draft</option>
           <option value="published">published</option>
         </select>
 
-        <label className="formLabel">Inhalt (content)</label>
-        <textarea
-          className="formTextarea"
-          rows={14}
-          value={form.content}
-          onChange={(e) =>
-            setForm((current) => ({ ...current, content: e.target.value }))
-          }
+        <label className="settingsLabel">Category</label>
+        <input
+          className="settingsInput"
+          value={form.category}
+          onChange={(e) => updateField("category", e.target.value)}
         />
 
-        <div className="cmsActions">
-          <button onClick={savePost}>Speichern</button>
-          {selectedPost && (
-            <button className="dangerButton" onClick={deletePost}>
-              Löschen
-            </button>
-          )}
-        </div>
-      </section>
+        <div className="settingsDivider" />
+
+        <button className="saveButton" onClick={savePost}>
+          Save post
+        </button>
+
+        <button className="deletePageButton" onClick={deleteActivePage}>
+          Delete current page
+        </button>
+
+        {selectedPost && (
+          <button className="dangerButton" onClick={deletePost}>
+            Delete post
+          </button>
+        )}
+      </aside>
     </div>
   );
 }

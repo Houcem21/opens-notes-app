@@ -1,0 +1,41 @@
+.richEditor {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: white;
+  overflow: hidden;
+}
+
+.richToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background: #f8f8f8;
+}
+
+.richToolbar button {
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.richEditorContent {
+  padding: 16px;
+  min-height: 320px;
+}
+
+.richEditorContent .ProseMirror {
+  min-height: 320px;
+  outline: none;
+}
+
+.richEditorContent .ProseMirror p {
+  margin: 0 0 12px;
+}
+
+.richEditorContent .ProseMirror h2 {
+  margin: 18px 0 10px;
+}

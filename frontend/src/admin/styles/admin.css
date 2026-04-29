@@ -92,3 +92,269 @@
   color: white;
   cursor: pointer;
 }
+
+.logoutButton {
+  width: 100%;
+  margin-top: 18px;
+  padding: 9px 14px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.pageEditorHeader {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pageEditorHeader button {
+  padding: 9px 14px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.pageTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.pageTab {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.pageTab.active {
+  background: #111;
+  color: white;
+  border-color: #111;
+}
+
+.deletePageButton {
+  margin-top: 12px;
+  padding: 9px 14px;
+  border: 1px solid #8b0000;
+  border-radius: 8px;
+  background: white;
+  color: #8b0000;
+  cursor: pointer;
+}
+
+.editorShell {
+  min-height: calc(100vh - 48px);
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 260px;
+  background: #f4f4f4;
+}
+
+.postQueue {
+  border-right: 1px solid #ddd;
+  background: white;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.postQueueHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.postQueueHeader h2 {
+  margin: 0;
+}
+
+.postQueueHeader button,
+.addPageButton,
+.saveButton {
+  padding: 9px 13px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.postQueueList {
+  margin-top: 16px;
+  flex: 1;
+  overflow: auto;
+}
+
+.postQueueItem {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.postQueueItem.active {
+  border-color: #111;
+  background: #f0f0f0;
+}
+
+.postQueueItem span {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.documentEditor {
+  padding: 32px;
+  overflow: auto;
+}
+
+.documentTitle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 42px;
+  font-weight: 800;
+  outline: none;
+  color: #111;
+}
+
+.documentSummary {
+  width: 100%;
+  min-height: 70px;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  font-size: 18px;
+  line-height: 1.5;
+  outline: none;
+  color: #555;
+  margin-top: 8px;
+}
+
+.pageBar {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.pageTab {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.pageTab.active {
+  background: #111;
+  color: white;
+  border-color: #111;
+}
+
+.pageDocument {
+  margin-top: 22px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.pageTitleInput {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  font-size: 26px;
+  font-weight: 700;
+  outline: none;
+  color: #111;
+}
+
+.editorSettings {
+  border-left: 1px solid #ddd;
+  background: white;
+  padding: 18px;
+}
+
+.editorSettings h2 {
+  margin-top: 0;
+}
+
+.settingsLabel {
+  display: block;
+  font-weight: 700;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.settingsInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.settingsDivider {
+  height: 1px;
+  background: #ddd;
+  margin: 22px 0;
+}
+
+.saveButton,
+.deletePageButton,
+.dangerButton {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.deletePageButton {
+  padding: 9px 13px;
+  border: 1px solid #8b0000;
+  border-radius: 8px;
+  background: white;
+  color: #8b0000;
+  cursor: pointer;
+}
+
+.dangerButton {
+  padding: 9px 13px;
+  border: 1px solid #8b0000;
+  border-radius: 8px;
+  background: #8b0000;
+  color: white;
+  cursor: pointer;
+}
+
+.editorImage {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+  border-radius: 10px;
+}

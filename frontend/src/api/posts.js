@@ -8,12 +8,43 @@ function slugify(text) {
     .replace(/^-+|-+$/g, "");
 }
 
+function normalizePages(post) {
+  if (Array.isArray(post.pages) && post.pages.length > 0) {
+    return post.pages;
+  }
+
+  if (post.content) {
+    return [{ title: "Page 1", content: post.content }];
+  }
+
+  return [{ title: "Page 1", content: "" }];
+}
+
 function normalizePost(post) {
   return {
     ...post,
     _id: post.id,
     createdAt: post.created_at,
     updatedAt: post.updated_at,
+    pages: normalizePages(post),
+  };
+}
+
+function toPayload(postData) {
+  const pages =
+    Array.isArray(postData.pages) && postData.pages.length > 0
+      ? postData.pages
+      : [{ title: "Page 1", content: postData.content || "" }];
+
+  return {
+    title: postData.title,
+    slug: slugify(postData.title),
+    summary: postData.summary || "",
+    category: postData.category || "general",
+    status: postData.status || "draft",
+    pages,
+    content: pages[0]?.content || "",
+    updated_at: new Date().toISOString(),
   };
 }
 
@@ -23,7 +54,7 @@ export const postsApi = {
       .from("posts")
       .select("*")
       .eq("status", "published")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
     return data.map(normalizePost);
@@ -33,21 +64,14 @@ export const postsApi = {
     const { data, error } = await supabase
       .from("posts")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
     return data.map(normalizePost);
   },
 
   async createPost(postData) {
-    const payload = {
-      title: postData.title,
-      slug: slugify(postData.title),
-      summary: postData.summary || "",
-      content: postData.content || "",
-      category: postData.category || "general",
-      status: postData.status || "draft",
-    };
+    const payload = toPayload(postData);
 
     const { data, error } = await supabase
       .from("posts")
@@ -60,15 +84,7 @@ export const postsApi = {
   },
 
   async updatePost(postId, postData) {
-    const payload = {
-      title: postData.title,
-      slug: slugify(postData.title),
-      summary: postData.summary || "",
-      content: postData.content || "",
-      category: postData.category || "general",
-      status: postData.status || "draft",
-      updated_at: new Date().toISOString(),
-    };
+    const payload = toPayload(postData);
 
     const { data, error } = await supabase
       .from("posts")
