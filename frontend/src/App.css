@@ -29,5 +29,5 @@ html, body, #root {
 }
 
 .appMain {
-  min-height: calc(100vh - 48px);
+  min-height: 100vh;
 }

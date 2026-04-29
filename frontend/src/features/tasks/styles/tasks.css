@@ -1,0 +1,221 @@
+.tasksPage {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f4f5f7;
+}
+
+.tasksHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.tasksHeader h1 {
+  margin: 0;
+}
+
+.tasksHeader p {
+  margin: 4px 0 0;
+  opacity: 0.7;
+}
+
+.tasksHeader button,
+.tasksLoginCard button,
+.newTaskForm button {
+  padding: 9px 14px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.tasksBoard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.taskColumn {
+  background: #ebecf0;
+  border-radius: 14px;
+  padding: 14px;
+  min-height: 420px;
+}
+
+.taskColumn h2 {
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.taskCard {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.taskCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.taskCardHeader button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.taskDescription {
+  margin: 8px 0;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.taskMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+
+.newTaskForm {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.newTaskForm input {
+  flex: 1;
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.tasksLoginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f6f6;
+}
+
+.tasksLoginCard {
+  width: 360px;
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+}
+
+.tasksLoginCard button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+
+
+.taskColumn.dragOver {
+  outline: 2px dashed #111;
+  background: #dde3ee;
+}
+
+.taskCard {
+  background: white;
+  border: 1px solid #ddd;
+  border-left: 5px solid #999;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: grab;
+}
+
+.taskCard:active {
+  cursor: grabbing;
+}
+
+.taskCard.priority-high {
+  border-left-color: #b00020;
+}
+
+.taskCard.priority-medium {
+  border-left-color: #c57f00;
+}
+
+.taskCard.priority-low {
+  border-left-color: #2f7d32;
+}
+
+.taskCardTop,
+.taskCardFooter,
+.taskCardActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.taskCard h3 {
+  margin: 10px 0 6px;
+  font-size: 16px;
+}
+
+.priorityBadge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f0f0f0;
+  text-transform: uppercase;
+}
+
+.taskDescription {
+  margin: 8px 0 12px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.4;
+}
+
+.taskCard button,
+.taskCardActions button {
+  padding: 6px 9px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.deleteTaskButton {
+  color: #8b0000 !important;
+  border-color: #e0b0b0 !important;
+}
+
+.taskEditTitle,
+.taskEditDescription,
+.taskPrioritySelect {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.taskEditDescription {
+  min-height: 90px;
+  resize: vertical;
+}

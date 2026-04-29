@@ -1,5 +1,5 @@
 .blogPage {
-  min-height: calc(100vh - 48px);
+  min-height: 100vh;
   display: grid;
   grid-template-columns: 320px 1fr;
   background: #f7f7f7;
@@ -7,6 +7,7 @@
 
 .blogList {
   padding: 18px;
+  padding-top: 50px;
   border-right: 1px solid #ddd;
   background: white;
 }
@@ -41,6 +42,7 @@
 
 .blogContent {
   padding: 40px;
+  padding-top: 80px;
   max-width: 900px;
 }
 

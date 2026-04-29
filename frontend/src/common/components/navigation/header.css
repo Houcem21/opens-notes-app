@@ -1,0 +1,41 @@
+.floatingHeader {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+}
+
+.navBar {
+  display: flex;
+  gap: 14px;
+  padding: 10px 18px;
+  border-radius: 999px;
+
+  background: rgba(120, 120, 120, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  color: #777;
+  transition: all 0.15s ease;
+}
+
+.icon.active {
+  color: #caa74a; /* gold */
+}
+
+.navItem:hover .icon {
+  color: #111;
+}
