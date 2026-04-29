@@ -1,6 +1,8 @@
 import { supabase } from "./supabase";
 import { timestampsFrom } from "../common/utils/dateMapping";
 
+import { requireData, requireOk } from "../common/utils/supabaseResult";
+
 function slugify(text) {
   return text
     .toLowerCase()
@@ -50,13 +52,13 @@ function toPayload(postData) {
 
 export const postsApi = {
   async getPublishedPosts() {
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("status", "published")
-      .order("created_at", { ascending: true });
-
-    if (error) throw error;
+    const data = requireData(
+      await supabase
+        .from("posts")
+        .select("*")
+        .eq("status", "published")
+        .order("created_at", { ascending: true })
+    );
     return data.map(normalizePost);
   },
 
@@ -98,8 +100,8 @@ export const postsApi = {
   },
 
   async deletePost(postId) {
-    const { error } = await supabase.from("posts").delete().eq("id", postId);
-    if (error) throw error;
-    return { ok: true };
-  },
+    return requireOk(
+      await supabase.from("posts").delete().eq("id", postId)
+    );
+  }
 };
