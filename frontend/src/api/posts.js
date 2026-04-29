@@ -3,6 +3,10 @@ import { timestampsFrom } from "../common/utils/dateMapping";
 
 import { requireData, requireOk } from "../common/utils/supabaseResult";
 
+function createUniqueSlug(title) {
+  return `${slugify(title)}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
 function slugify(text) {
   return text
     .toLowerCase()
@@ -40,7 +44,7 @@ function toPayload(postData) {
 
   return {
     title: postData.title,
-    slug: slugify(postData.title),
+    slug: postData.slug || createUniqueSlug(postData.title),
     summary: postData.summary || "",
     category: postData.category || "general",
     status: postData.status || "draft",

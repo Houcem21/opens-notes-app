@@ -134,13 +134,18 @@ export default function BlogCms() {
         return;
       }
 
+      let savedPost;
+
       if (selectedPost) {
-        await postsApi.updatePost(selectedPost._id, form);
+        savedPost = await postsApi.updatePost(selectedPost._id, form);
       } else {
-        await postsApi.createPost(form);
+        savedPost = await postsApi.createPost(form);
       }
 
       await loadPosts();
+
+      setSelectedPostId(savedPost._id);
+      setForm(savedPost);
     } catch (err) {
       setError(err.message);
     }
