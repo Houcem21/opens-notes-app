@@ -1,42 +1,8 @@
 import { supabase } from "./supabase";
-import { timestampsFrom } from "../common/utils/dateMapping";
 import { requireOk, requireData } from "../common/utils/supabaseResult";
 
-function normalizeBoard(board) {
-  return {
-    ...board,
-    id: board.id,
-    title: board.title,
-    ownerId: board.owner_id,
-    ...timestampsFrom(board),
-  };
-}
+import {normalizeBoard, normalizeColumn, normalizeTask} from "./mappers/taskMapper"
 
-function normalizeColumn(column) {
-  return {
-    ...column,
-    id: column.id,
-    boardId: column.board_id,
-    title: column.title,
-    position: column.position,
-    ...timestampsFrom(column),
-  };
-}
-
-function normalizeTask(task) {
-  return {
-    ...task,
-    id: task.id,
-    boardId: task.board_id,
-    columnId: task.column_id,
-    title: task.title,
-    description: task.description || "",
-    priority: task.priority || "medium",
-    position: task.position,
-    dueDate: task.due_date,
-    ...timestampsFrom(task),
-  };
-}
 
 export const tasksApi = {
   async getBoards() {
