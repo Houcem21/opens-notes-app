@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { timestampsFrom } from "../common/utils/dateMapping";
+import { requireOk, requireData } from "../common/utils/supabaseResult";
 
 function normalizeBoard(board) {
   return {
@@ -39,12 +40,11 @@ function normalizeTask(task) {
 
 export const tasksApi = {
   async getBoards() {
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("task_boards")
       .select("*")
-      .order("created_at", { ascending: true });
-
-    if (error) throw error;
+      .order("created_at", { ascending: true })
+    );
     return data.map(normalizeBoard);
   },
 
@@ -57,32 +57,30 @@ export const tasksApi = {
     if (userError) throw userError;
     if (!user) throw new Error("Login required");
 
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("task_boards")
       .insert({
         title,
         owner_id: user.id,
       })
       .select()
-      .single();
+      .single());
 
-    if (error) throw error;
     return normalizeBoard(data);
   },
 
   async getColumns(boardId) {
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("task_columns")
       .select("*")
       .eq("board_id", boardId)
-      .order("position", { ascending: true });
+      .order("position", { ascending: true }));
 
-    if (error) throw error;
     return data.map(normalizeColumn);
   },
 
   async createColumn({ boardId, title, position = 0 }) {
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("task_columns")
       .insert({
         board_id: boardId,
@@ -90,9 +88,8 @@ export const tasksApi = {
         position,
       })
       .select()
-      .single();
+      .single());
 
-    if (error) throw error;
     return normalizeColumn(data);
   },
 
@@ -104,35 +101,31 @@ export const tasksApi = {
     if (typeof updates.title === "string") payload.title = updates.title;
     if (typeof updates.position === "number") payload.position = updates.position;
 
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("task_columns")
       .update(payload)
       .eq("id", columnId)
       .select()
-      .single();
+      .single());
 
-    if (error) throw error;
     return normalizeColumn(data);
   },
 
   async deleteColumn(columnId) {
-    const { error } = await supabase
+    return requireOk(await supabase
       .from("task_columns")
       .delete()
-      .eq("id", columnId);
-
-    if (error) throw error;
-    return { ok: true };
+      .eq("id", columnId)
+    );
   },
 
   async getTasks(boardId) {
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("tasks")
       .select("*")
       .eq("board_id", boardId)
-      .order("position", { ascending: true });
+      .order("position", { ascending: true }));
 
-    if (error) throw error;
     return data.map(normalizeTask);
   },
 
@@ -145,7 +138,7 @@ export const tasksApi = {
     position = 0,
     dueDate = null,
   }) {
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("tasks")
       .insert({
         board_id: boardId,
@@ -157,9 +150,8 @@ export const tasksApi = {
         due_date: dueDate,
       })
       .select()
-      .single();
+      .single());
 
-    if (error) throw error;
     return normalizeTask(data);
   },
 
@@ -176,21 +168,19 @@ export const tasksApi = {
     if ("columnId" in updates) payload.column_id = updates.columnId;
     if ("dueDate" in updates) payload.due_date = updates.dueDate;
 
-    const { data, error } = await supabase
+    const data = requireData(await supabase
       .from("tasks")
       .update(payload)
       .eq("id", taskId)
       .select()
-      .single();
+      .single());
 
-    if (error) throw error;
     return normalizeTask(data);
   },
 
   async deleteTask(taskId) {
-    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
-
-    if (error) throw error;
-    return { ok: true };
+    return requireOk(
+      await supabase.from("tasks").delete().eq("id", taskId)
+    );
   },
 };

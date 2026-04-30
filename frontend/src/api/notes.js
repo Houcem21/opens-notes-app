@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { timestampsFrom } from "../common/utils/dateMapping";
+import {requireData, requireOk} from "../common/utils/supabaseResult"
 
 function normalizeTree(tree) {
   return {
@@ -39,12 +40,13 @@ export const notesApi = {
   // --------------------
 
   async getTrees() {
-    const { data, error } = await supabase
-      .from("trees")
-      .select("*")
-      .order("created_at", { ascending: true });
+    const data = requireData(
+      await supabase
+        .from("trees")
+        .select("*")
+        .order("created_at", { ascending: true })
+    );
 
-    if (error) throw error;
     return data.map(normalizeTree);
   },
 
@@ -57,16 +59,17 @@ export const notesApi = {
     if (userError) throw userError;
     if (!user) throw new Error("Login required");
 
-    const { data, error } = await supabase
-      .from("trees")
-      .insert({
-        name,
-        owner_id: user.id,
-      })
-      .select()
-      .single();
+    const data = requireData(
+      await supabase
+        .from("trees")
+        .insert({
+          name,
+          owner_id: user.id,
+        })
+        .select()
+        .single()
+    );
 
-    if (error) throw error;
     return normalizeTree(data);
   },
 
@@ -77,22 +80,22 @@ export const notesApi = {
 
     if (typeof updates.name === "string") payload.name = updates.name;
 
-    const { data, error } = await supabase
-      .from("trees")
-      .update(payload)
-      .eq("id", treeId)
-      .select()
-      .single();
+    const data = requireData(
+      await supabase
+        .from("trees")
+        .update(payload)
+        .eq("id", treeId)
+        .select()
+        .single()
+    );
 
-    if (error) throw error;
     return normalizeTree(data);
   },
 
   async deleteTree(treeId) {
-    const { error } = await supabase.from("trees").delete().eq("id", treeId);
-
-    if (error) throw error;
-    return { ok: true };
+    return requireOk(
+      await supabase.from("trees").delete().eq("id", treeId)
+    )
   },
 
   // --------------------
@@ -100,33 +103,35 @@ export const notesApi = {
   // --------------------
 
   async getNodes(treeId) {
-    const { data, error } = await supabase
-      .from("nodes")
-      .select("*")
-      .eq("tree_id", treeId)
-      .order("created_at", { ascending: true });
+    const data = requireData(
+      await supabase
+        .from("nodes")
+        .select("*")
+        .eq("tree_id", treeId)
+        .order("created_at", { ascending: true })
+    );
 
-    if (error) throw error;
     return data.map(normalizeNode);
   },
 
   async createNode({ treeId, parentId = null, title = "New", notes = "" }) {
-    const { data, error } = await supabase
-      .from("nodes")
-      .insert({
-        tree_id: treeId,
-        parent_id: parentId,
-        title,
-        notes,
-        status: "not_started",
-        priority: "medium",
-        pos_x: 0,
-        pos_y: 0,
-      })
-      .select()
-      .single();
+    const data = requireData(
+      await supabase
+        .from("nodes")
+        .insert({
+          tree_id: treeId,
+          parent_id: parentId,
+          title,
+          notes,
+          status: "not_started",
+          priority: "medium",
+          pos_x: 0,
+          pos_y: 0,
+        })
+        .select()
+        .single()
+    );
 
-    if (error) throw error;
     return normalizeNode(data);
   },
 
@@ -149,22 +154,22 @@ export const notesApi = {
       payload.pos_y = updates.pos.y ?? 0;
     }
 
-    const { data, error } = await supabase
-      .from("nodes")
-      .update(payload)
-      .eq("id", nodeId)
-      .select()
-      .single();
+    const data = requireData(
+      await supabase
+        .from("nodes")
+        .update(payload)
+        .eq("id", nodeId)
+        .select()
+        .single()
+    );
 
-    if (error) throw error;
     return normalizeNode(data);
   },
 
   async deleteNode(nodeId) {
-    const { error } = await supabase.from("nodes").delete().eq("id", nodeId);
-
-    if (error) throw error;
-    return { ok: true };
+    return requireOk(
+      await supabase.from("nodes").delete().eq("id", nodeId)
+    );
   },
 
   // --------------------
@@ -172,39 +177,40 @@ export const notesApi = {
   // --------------------
 
   async getDependencies(treeId) {
-    const { data, error } = await supabase
-      .from("dependencies")
-      .select("*")
-      .eq("tree_id", treeId)
-      .order("created_at", { ascending: true });
+    const data = requireData(
+      await supabase
+        .from("dependencies")
+        .select("*")
+        .eq("tree_id", treeId)
+        .order("created_at", { ascending: true })
+      );
 
-    if (error) throw error;
     return data.map(normalizeDependency);
   },
 
   async createDependency({ treeId, fromNodeId, toNodeId, type = "requires" }) {
-    const { data, error } = await supabase
-      .from("dependencies")
-      .insert({
-        tree_id: treeId,
-        from_node_id: fromNodeId,
-        to_node_id: toNodeId,
-        type,
-      })
-      .select()
-      .single();
+    const data = requireData(
+      await supabase
+        .from("dependencies")
+        .insert({
+          tree_id: treeId,
+          from_node_id: fromNodeId,
+          to_node_id: toNodeId,
+          type,
+        })
+        .select()
+        .single()
+    );
 
-    if (error) throw error;
     return normalizeDependency(data);
   },
 
   async deleteDependency(dependencyId) {
-    const { error } = await supabase
+    return requireOk(
+      await supabase
       .from("dependencies")
       .delete()
-      .eq("id", dependencyId);
-
-    if (error) throw error;
-    return { ok: true };
+      .eq("id", dependencyId)
+    );
   },
 };

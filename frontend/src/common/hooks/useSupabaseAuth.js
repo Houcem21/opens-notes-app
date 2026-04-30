@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../api/supabase";
+import { requireData } from "../utils/supabaseResult";
 
 export function useSupabaseAuth() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   async function loadSession() {
-    const { data, error } = await supabase.auth.getSession();
+    const data = requireData(await supabase.auth.getSession());
 
-    if (error) throw error;
 
     setSession(data.session);
     setAuthLoading(false);
@@ -17,12 +17,10 @@ export function useSupabaseAuth() {
   }
 
   async function login({ email, password }) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const data = requireData(await supabase.auth.signInWithPassword({
       email,
       password,
-    });
-
-    if (error) throw error;
+    }));
 
     setSession(data.session);
     return data.session;
