@@ -123,6 +123,14 @@ export default function RichTextEditor({ value, onChange }) {
           {uploadingImage ? "Uploading..." : "Image"}
         </button>
 
+        <button
+          type="button"
+          className={editor.isActive("codeBlock") ? "isActive" : ""}
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        >
+          Code
+        </button>
+
         <input
           ref={fileInputRef}
           type="file"

@@ -1,5 +1,5 @@
 // Tools
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 
 // Pages
 import BlogPage from "./features/blog/pages/BlogPage";
@@ -13,9 +13,14 @@ import Header from "./common/components/navigation/Header";
 
 
 export default function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <div className="appShell">
-      <Header />
+      {!isAdmin && (
+        <Header />
+      )}
       <main className="appMain">
         <Routes>
           <Route path="/" element={<Home />} />

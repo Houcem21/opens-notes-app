@@ -19,6 +19,10 @@ export default function BlogCms() {
   const selectedPost = posts.find((post) => post._id === selectedPostId);
   const activePage = form.pages?.[activePageIndex];
 
+
+  const [leftOpen, setLeftOpen] = useState(true);
+  const [rightOpen, setRightOpen] = useState(true);
+
   const { isLoggedIn, authLoading, login, logout } = useSupabaseAuth();
 
   async function loadPosts() {
@@ -179,11 +183,28 @@ export default function BlogCms() {
     );
   }
   return (
-    <div className="editorShell">
+    <div
+      className={`editorShell ${!leftOpen ? "leftClosed" : ""} ${
+        !rightOpen ? "rightClosed" : ""
+      }`}
+    >
+      <button
+        className="sidebarToggle leftToggle"
+        onClick={() => setLeftOpen((value) => !value)}
+      >
+        {leftOpen ? "‹" : "›"}
+      </button>
+
+      <button
+        className="sidebarToggle rightToggle"
+        onClick={() => setRightOpen((value) => !value)}
+      >
+        {rightOpen ? "›" : "‹"}
+      </button>
       <aside className="postQueue">
         <div className="postQueueHeader">
           <h2>Posts</h2>
-          <button onClick={startNewPost}>New</button>
+          <button className="btn" onClick={startNewPost}>New</button>
         </div>
 
         <div className="postQueueList">
@@ -201,7 +222,7 @@ export default function BlogCms() {
           ))}
         </div>
 
-        <button className="btn btnSecondary" onClick={handleLogout}>
+        <button className="btn btnSecondary logoutBtn" onClick={handleLogout}>
           Logout
         </button>
       </aside>
@@ -280,7 +301,7 @@ export default function BlogCms() {
 
         <div className="settingsDivider" />
 
-        <button className="btn" onClick={savePost}>
+        <button className="btn savePostBtn" onClick={savePost}>
           Save post
         </button>
 

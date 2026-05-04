@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { postsApi } from "../../../api/posts";
 import ErrorMessage from "../../../common/components/ErrorMessage";
+import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";
 
 export default function BlogPage() {
@@ -14,6 +15,10 @@ export default function BlogPage() {
 
   const pages = selectedPost?.pages || [];
   const activePage = pages[activePageIndex];
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const contentRef = useRef(null);
 
   useEffect(() => {
     async function loadPosts() {
@@ -29,6 +34,19 @@ export default function BlogPage() {
 
     loadPosts();
   }, []);
+
+  function scrollBlogToTop() {
+    requestAnimationFrame(() => {
+      contentRef.current?.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+  }
+
+  useEffect(() => {
+    scrollBlogToTop();
+  }, [selectedPostId, activePageIndex]);
 
   function selectPost(post) {
     setSelectedPostId(post._id);
@@ -46,9 +64,15 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="blogPage">
+    <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
+      <button
+        className="blogSidebarToggle"
+        onClick={() => setSidebarOpen((value) => !value)}
+      >
+        {sidebarOpen ? "‹" : "›"}
+      </button>
       <aside className="blogList">
-        <h2>Onboarding Blog</h2>
+        <h2 className="blogListTitle">Docs</h2>
 
         <ErrorMessage message={error} />
 
@@ -56,21 +80,24 @@ export default function BlogPage() {
           <p className="blogEmpty">Keine veröffentlichten Posts.</p>
         )}
 
-        {posts.map((post) => (
-          <button
-            key={post._id}
-            className={`blogListItem ${
-              selectedPost?._id === post._id ? "active" : ""
-            }`}
-            onClick={() => selectPost(post)}
-          >
-            <strong>{post.title}</strong>
-            <span>{post.category}</span>
-          </button>
-        ))}
+        <ul className="blogListPosts">
+          {posts.map((post) => (
+            <li className="blogListPostsItem" key={post._id}>
+              <button
+                className={`blogListItem ${
+                  selectedPost?._id === post._id ? "active" : ""
+                }`}
+                onClick={() => selectPost(post)}
+              >
+                <strong>{post.title}</strong>
+                <span>{post.category}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </aside>
 
-      <main className="blogContent">
+      <main className="blogContent" ref={contentRef}>
         {!selectedPost || !activePage ? (
           <div className="blogPlaceholder">
             <h1>Willkommen</h1>
@@ -93,7 +120,9 @@ export default function BlogPage() {
 
             <div
               className="blogBody"
-              dangerouslySetInnerHTML={{ __html: activePage.content }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(activePage.content),
+              }}            
             />
 
             <div className="blogPageControls">
@@ -101,14 +130,14 @@ export default function BlogPage() {
                 onClick={goPreviousPage}
                 disabled={activePageIndex === 0}
               >
-                Vorherige Seite
+                Previous
               </button>
 
               <button
                 onClick={goNextPage}
                 disabled={activePageIndex >= pages.length - 1}
               >
-                Nächste Seite
+                Next
               </button>
             </div>
           </article>
