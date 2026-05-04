@@ -6,7 +6,10 @@ import TaskColumn from "./TaskColumn";
 
 import AuthForm from "../../../common/components/AuthForm";
 
-const DEFAULT_COLUMNS = ["To Do", "In Progress", "Done"];
+import {
+  DEFAULT_TASK_BOARD_TITLE,
+  DEFAULT_TASK_COLUMNS,
+} from "../../../common/constants/taskDefaults";
 
 export default function TaskBoard() {
     const [board, setBoard] = useState(null);
@@ -31,20 +34,32 @@ export default function TaskBoard() {
         let currentBoard = boards[0];
 
         if (!currentBoard) {
-        currentBoard = await tasksApi.createBoard({ title: "Team Tasks" });
+            await tasksApi.createBoard({
+                title: DEFAULT_TASK_BOARD_TITLE,
+            });
         }
 
         let boardColumns = await tasksApi.getColumns(currentBoard.id);
 
-        if (boardColumns.length === 0) {
-        boardColumns = await Promise.all(
-            DEFAULT_COLUMNS.map((title, index) =>
+        const existingTitles = new Set(boardColumns.map((column) => column.title));
+
+        const missingColumns = DEFAULT_TASK_COLUMNS
+        .map((title, index) => ({ title, position: index }))
+        .filter((column) => !existingTitles.has(column.title));
+
+        if (missingColumns.length > 0) {
+        const createdColumns = await Promise.all(
+            missingColumns.map((column) =>
             tasksApi.createColumn({
                 boardId: currentBoard.id,
-                title,
-                position: index,
+                title: column.title,
+                position: column.position,
             })
             )
+        );
+
+        boardColumns = [...boardColumns, ...createdColumns].sort(
+            (a, b) => a.position - b.position
         );
         }
 

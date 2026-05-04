@@ -3,6 +3,7 @@ import { requireOk, requireData } from "../common/utils/supabaseResult";
 
 import {normalizeBoard, normalizeColumn, normalizeTask} from "./mappers/taskMapper"
 
+import { requireCurrentUser } from "../common/utils/currentUser";
 
 export const tasksApi = {
   async getBoards() {
@@ -15,14 +16,8 @@ export const tasksApi = {
   },
 
   async createBoard({ title }) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError) throw userError;
-    if (!user) throw new Error("Login required");
-
+    const user = requireCurrentUser();
+    
     const data = requireData(await supabase
       .from("task_boards")
       .insert({

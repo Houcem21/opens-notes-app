@@ -1,38 +1,13 @@
 import { supabase } from "./supabase";
-import { timestampsFrom } from "../common/utils/dateMapping";
-import {requireData, requireOk} from "../common/utils/supabaseResult"
+import {
+  normalizeTree,
+  normalizeNode,
+  normalizeDependency,
+} from "./mappers/noteMapper";
 
-function normalizeTree(tree) {
-  return {
-    ...tree,
-    ...timestampsFrom(tree),
-  };
-}
+import {requireData, requireOk} from "../common/utils/supabaseResult";
 
-function normalizeNode(node) {
-  return {
-    ...node,
-    id: node.id,
-    treeId: node.tree_id,
-    parentId: node.parent_id,
-    ...timestampsFrom(node),
-    pos: {
-      x: Number(node.pos_x || 0),
-      y: Number(node.pos_y || 0),
-    },
-  };
-}
-
-function normalizeDependency(dep) {
-  return {
-    ...dep,
-    id: dep.id,
-    treeId: dep.tree_id,
-    fromNodeId: dep.from_node_id,
-    toNodeId: dep.to_node_id,
-    ...timestampsFrom(dep),
-  };
-}
+import { requireCurrentUser } from "../common/utils/currentUser";
 
 export const notesApi = {
   // --------------------
@@ -51,13 +26,7 @@ export const notesApi = {
   },
 
   async createTree({ name }) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError) throw userError;
-    if (!user) throw new Error("Login required");
+    const user = await requireCurrentUser();
 
     const data = requireData(
       await supabase
@@ -98,9 +67,7 @@ export const notesApi = {
     )
   },
 
-  // --------------------
   // Nodes
-  // --------------------
 
   async getNodes(treeId) {
     const data = requireData(

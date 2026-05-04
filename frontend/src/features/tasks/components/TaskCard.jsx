@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { TASK_PRIORITIES } from "../../../common/constants/taskDefaults";
 
 export default function TaskCard({ task, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
@@ -56,9 +57,11 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
             setDraft((current) => ({ ...current, priority: e.target.value }))
           }
         >
-          <option value="high">high</option>
-          <option value="medium">medium</option>
-          <option value="low">low</option>
+          {TASK_PRIORITIES.map((priority) => (
+            <option key={priority} value={priority}>
+              {priority}
+            </option>
+          ))}
         </select>
 
         <div className="taskCardActions">
