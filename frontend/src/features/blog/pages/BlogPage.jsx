@@ -113,7 +113,7 @@ export default function BlogPage() {
             )}
 
             <div className="blogPageCounter">
-              Seite {activePageIndex + 1} von {pages.length}
+              Page {activePageIndex + 1} of {pages.length}
             </div>
 
             <h2>{activePage.title}</h2>
