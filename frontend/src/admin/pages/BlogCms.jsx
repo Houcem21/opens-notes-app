@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { postsApi } from "../../api/posts";
 import ErrorMessage from "../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
 import { useSupabaseAuth } from "../../common/hooks/useSupabaseAuth"
@@ -9,14 +8,20 @@ import AuthForm from "../../common/components/AuthForm";
 
 import "../styles/admin.css";
 
+import AdminGate from "../../common/components/AdminGate";
+import OrgGate from "../../common/components/OrgGate";
+import { orgGateApi } from "../../api/orgGate";
+
 export default function BlogCms() {
+  const [adminToken, setAdminToken] = useState(orgGateApi.getAdminToken());
+
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [form, setForm] = useState(createEmptyPostForm());
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
 
-  const selectedPost = posts.find((post) => post._id === selectedPostId);
+  const selectedPost = posts.find((post) => post.id === selectedPostId);
   const activePage = form.pages?.[activePageIndex];
 
 
@@ -31,7 +36,7 @@ export default function BlogCms() {
 
       if (!isLoggedIn) return;
 
-      const data = await postsApi.getAdminPosts();
+      const data = await orgGateApi.getAdminPosts();
       setPosts(data);
     } catch (err) {
       setError(err.message);
@@ -59,7 +64,7 @@ export default function BlogCms() {
   }
 
   function selectPost(post) {
-    setSelectedPostId(post._id);
+    setSelectedPostId(post.id);
     setForm({
       title: post.title || "",
       summary: post.summary || "",
@@ -141,14 +146,17 @@ export default function BlogCms() {
       let savedPost;
 
       if (selectedPost) {
-        savedPost = await postsApi.updatePost(selectedPost._id, form);
+        savedPost = await orgGateApi.saveAdminPost({
+          ...form,
+          id: selectedPost.id,
+        });
       } else {
-        savedPost = await postsApi.createPost(form);
+        savedPost = await orgGateApi.saveAdminPost(form);
       }
 
       await loadPosts();
 
-      setSelectedPostId(savedPost._id);
+      setSelectedPostId(savedPost.id);
       setForm(savedPost);
     } catch (err) {
       setError(err.message);
@@ -161,7 +169,7 @@ export default function BlogCms() {
 
     try {
       setError("");
-      await postsApi.deletePost(selectedPost._id);
+      await orgGateApi.deletePost(selectedPost.id);
       await loadPosts();
       startNewPost();
     } catch (err) {
@@ -171,6 +179,26 @@ export default function BlogCms() {
 
   if (authLoading) {
     return <div className="page">Loading...</div>;
+  }
+
+  if (!orgGateApi.getOrgToken()) {
+    return (
+      <OrgGate
+        onSuccess={() => {
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  if (!adminToken) {
+    return (
+      <AdminGate
+        onSuccess={(token) => {
+          setAdminToken(token);
+        }}
+      />
+    );
   }
 
   if (!isLoggedIn) {
@@ -210,9 +238,9 @@ export default function BlogCms() {
         <div className="postQueueList">
           {posts.map((post) => (
             <button
-              key={post._id}
+              key={post.id}
               className={`postQueueItem ${
-                post._id === selectedPostId ? "active" : ""
+                post.id === selectedPostId ? "active" : ""
               }`}
               onClick={() => selectPost(post)}
             >

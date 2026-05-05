@@ -50,6 +50,7 @@
   align-items: center;
   justify-content: center;
   background: var(--color-bg);
+  text-align: center;
 }
 
 .authCard {
@@ -63,4 +64,8 @@
 .authSubmitButton {
   width: 100%;
   margin-top: var(--space-md);
+}
+
+.mutedText {
+  color: var(--color-muted);
 }

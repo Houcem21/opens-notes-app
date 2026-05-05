@@ -4,14 +4,19 @@ import ErrorMessage from "../../../common/components/ErrorMessage";
 import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";
 
+import OrgGate from "../../../common/components/OrgGate";
+import { orgGateApi } from "../../../api/orgGate";
+
 export default function BlogPage() {
+  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
+
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
 
   const selectedPost =
-    posts.find((post) => post._id === selectedPostId) || posts[0];
+    posts.find((post) => (post.id) === selectedPostId) || posts[0];
 
   const pages = selectedPost?.pages || [];
   const activePage = pages[activePageIndex];
@@ -22,18 +27,22 @@ export default function BlogPage() {
 
   useEffect(() => {
     async function loadPosts() {
+      if (!activeOrg) return;
+
       try {
         setError("");
-        const data = await postsApi.getPublishedPosts();
+        const data = await orgGateApi.getOrgPosts();
         setPosts(data);
-        if (data.length > 0) setSelectedPostId(data[0]._id);
+        if (data.length > 0) setSelectedPostId(data[0].id);
       } catch (err) {
+        orgGateApi.clearOrgSession();
+        setActiveOrg(null);
         setError(err.message);
       }
     }
 
     loadPosts();
-  }, []);
+  }, [activeOrg]);
 
   function scrollBlogToTop() {
     requestAnimationFrame(() => {
@@ -49,7 +58,7 @@ export default function BlogPage() {
   }, [selectedPostId, activePageIndex]);
 
   function selectPost(post) {
-    setSelectedPostId(post._id);
+    setSelectedPostId(post.id);
     setActivePageIndex(0);
   }
 
@@ -62,6 +71,16 @@ export default function BlogPage() {
       Math.min(pages.length - 1, current + 1)
     );
   }
+
+  if (!activeOrg) {
+  return (
+    <OrgGate
+      onSuccess={(organization) => {
+        setActiveOrg(organization);
+      }}
+    />
+  );
+}
 
   return (
     <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
@@ -77,15 +96,15 @@ export default function BlogPage() {
         <ErrorMessage message={error} />
 
         {posts.length === 0 && (
-          <p className="blogEmpty">Keine veröffentlichten Posts.</p>
+          <p className="blogEmpty">No Posts.</p>
         )}
 
         <ul className="blogListPosts">
           {posts.map((post) => (
-            <li className="blogListPostsItem" key={post._id}>
+            <li className="blogListPostsItem" key={post.id}>
               <button
                 className={`blogListItem ${
-                  selectedPost?._id === post._id ? "active" : ""
+                  selectedPost?.id === post.id ? "active" : ""
                 }`}
                 onClick={() => selectPost(post)}
               >
@@ -100,8 +119,8 @@ export default function BlogPage() {
       <main className="blogContent" ref={contentRef}>
         {!selectedPost || !activePage ? (
           <div className="blogPlaceholder">
-            <h1>Willkommen</h1>
-            <p>Wähle einen Artikel, um zu starten.</p>
+            <h1>Loading</h1>
+            <p>Just starting...</p>
           </div>
         ) : (
           <article>
