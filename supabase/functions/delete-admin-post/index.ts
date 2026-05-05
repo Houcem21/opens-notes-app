@@ -1,50 +1,10 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-async function sha256(value: string) {
-  const data = new TextEncoder().encode(value);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-
-  return Array.from(new Uint8Array(hash))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function getAdminSession(supabase: any, adminToken: string) {
-  const tokenHash = await sha256(adminToken);
-
-  const { data: session, error } = await supabase
-    .from("org_sessions")
-    .select("organization_id, expires_at")
-    .eq("token_hash", tokenHash)
-    .eq("session_type", "admin")
-    .maybeSingle();
-
-  if (error) throw error;
-  if (!session) throw new Error("Invalid admin session");
-  if (new Date(session.expires_at).getTime() < Date.now()) {
-    throw new Error("Admin session expired");
-  }
-
-  return session;
-}
+import { handleOptions, jsonResponse } from "../_shared/responses.ts";
+import { createServiceClient } from "../_shared/client.ts";
+import { getValidSession } from "../_shared/sessions.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  const optionsResponse = handleOptions(req);
+  if (optionsResponse) return optionsResponse;
 
   if (req.method !== "POST") {
     return jsonResponse({ error: "Method not allowed" }, 405);
@@ -61,12 +21,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Post id is required" }, 400);
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
-    const session = await getAdminSession(supabase, adminToken);
+    const supabase = createServiceClient();
+    const session = await getValidSession(supabase, adminToken, "admin");
 
     const { error } = await supabase
       .from("posts")

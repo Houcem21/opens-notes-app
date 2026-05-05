@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { postsApi } from "../../../api/posts";
 import ErrorMessage from "../../../common/components/ErrorMessage";
 import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";

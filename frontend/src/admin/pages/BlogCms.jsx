@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ErrorMessage from "../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../common/constants/postDefaults";
-import { useSupabaseAuth } from "../../common/hooks/useSupabaseAuth"
 import RichTextEditor from "../components/editor/RichTextEditor";
 
 import AuthForm from "../../common/components/AuthForm";
@@ -13,6 +12,7 @@ import OrgGate from "../../common/components/OrgGate";
 import { orgGateApi } from "../../api/orgGate";
 
 export default function BlogCms() {
+  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
   const [adminToken, setAdminToken] = useState(orgGateApi.getAdminToken());
 
   const [posts, setPosts] = useState([]);
@@ -28,13 +28,10 @@ export default function BlogCms() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
 
-  const { isLoggedIn, authLoading, login, logout } = useSupabaseAuth();
 
   async function loadPosts() {
     try {
-      setError("");
-
-      if (!isLoggedIn) return;
+      if (!activeOrg || !adminToken) return;
 
       const data = await orgGateApi.getAdminPosts();
       setPosts(data);
@@ -45,23 +42,7 @@ export default function BlogCms() {
 
   useEffect(() => {
     loadPosts();
-  }, [isLoggedIn]);
-
-  async function handleLogin(credentials) {
-    try {
-      setError("");
-      await login(credentials);
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  async function handleLogout() {
-    await logout();
-    setPosts([]);
-    setSelectedPostId(null);
-    setForm(createEmptyPostForm());
-  }
+  }, [activeOrg, adminToken]);
 
   function selectPost(post) {
     setSelectedPostId(post.id);
@@ -177,11 +158,8 @@ export default function BlogCms() {
     }
   }
 
-  if (authLoading) {
-    return <div className="page">Loading...</div>;
-  }
 
-  if (!orgGateApi.getOrgToken()) {
+  if (!activeOrg) {
     return (
       <OrgGate
         onSuccess={() => {
@@ -201,15 +179,6 @@ export default function BlogCms() {
     );
   }
 
-  if (!isLoggedIn) {
-    return (
-      <AuthForm
-        title="Admin Login"
-        error={error}
-        onSubmit={handleLogin}
-      />
-    );
-  }
   return (
     <div
       className={`editorShell ${!leftOpen ? "leftClosed" : ""} ${
@@ -250,7 +219,13 @@ export default function BlogCms() {
           ))}
         </div>
 
-        <button className="btn btnSecondary logoutBtn" onClick={handleLogout}>
+        <button
+          className="btn btnSecondary logoutBtn"
+          onClick={() => {
+            orgGateApi.clearAdminSession();
+            window.location.reload();
+          }}
+        >
           Logout
         </button>
       </aside>

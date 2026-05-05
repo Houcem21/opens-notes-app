@@ -30,7 +30,7 @@ export default function BlockNode({ id, data, selected }) {
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
 
       <div className="blockHeader">
-        <button
+        {!data.readOnly && (<button
           className="iconBtn"
           title="Add child"
           onClick={(e) => {
@@ -39,9 +39,9 @@ export default function BlockNode({ id, data, selected }) {
           }}
         >
           +
-        </button>
+        </button>)}
 
-        {!isRoot && (
+        {(!isRoot && !data.readOnly) && (
           <button
             className="iconBtn danger"
             title="Delete"

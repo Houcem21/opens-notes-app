@@ -125,4 +125,17 @@ export const orgGateApi = {
       postId,
     });
   },
+
+  
+// Notes
+
+  async getOrgNotes() {
+  const orgToken = this.getOrgToken();
+
+  if (!orgToken) {
+    throw new Error("Organization access required.");
+  }
+
+  return callFunction("get-org-notes", { orgToken });
+},
 };

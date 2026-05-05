@@ -14,10 +14,11 @@ import "reactflow/dist/style.css";
 
 import NodeEditorModal from "./NodeEditorModal";
 import BlockNode from "./BlockNode";
-import { notesApi } from "../../../api/notes";
+import { orgGateApi } from "../../../api/orgGate";
 
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 
+import OrgGate from "../../../common/components/OrgGate";
 
 import "../styles/notes.css"
 
@@ -37,6 +38,7 @@ return !(
 }
 
 export default function TreeCanvas() {
+  
   // The provider must wrap any component that calls useReactFlow()
   return (
     <ReactFlowProvider>
@@ -46,6 +48,8 @@ export default function TreeCanvas() {
 }
 
 function TreeCanvasInner() {
+  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
+
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -83,26 +87,21 @@ function TreeCanvasInner() {
 
   // ---- API helpers ----
   async function ensureTreeAndRoot() {
-    const trees = await notesApi.getTrees();
-    let t = trees?.[0];
+    const data = await orgGateApi.getOrgNotes();
 
-    if (!t) {
-      t = await notesApi.createTree({ name: "Learning" });
+    if (!data.tree) {
+      return {
+        tree: { id: null, name: "No notes yet" },
+        nodes: [],
+        dependencies: [],
+      };
     }
 
-    const ns = await notesApi.getNodes(t.id);
-
-    if (!Array.isArray(ns) || ns.length === 0) {
-      const root = await notesApi.createNode({
-        treeId: t.id,
-        parentId: null,
-        title: t.name || "Root",
-      });
-
-      return { tree: t, nodes: [root] };
-    }
-
-    return { tree: t, nodes: ns };
+    return {
+      tree: data.tree,
+      nodes: data.nodes || [],
+      dependencies: data.dependencies || [],
+    };
   }
 
   function toFlowNodes(apiNodes, treeId) {
@@ -118,7 +117,8 @@ function TreeCanvasInner() {
         notes: n.notes || "",
         isRoot: n.id === rootId,
         treeId,
-        parentId: n.parentId, // ✅ keep for edges
+        parentId: n.parentId,
+        readOnly: true,
       },
     }));
   }
@@ -126,7 +126,7 @@ function TreeCanvasInner() {
   async function refresh() {
     setLoading(true);
     try {
-      const { tree: t, nodes: apiNodes } = await ensureTreeAndRoot();
+      const { tree: t, nodes: apiNodes, dependencies } = await ensureTreeAndRoot();
       setTree(t);
       setNodes(toFlowNodes(apiNodes, t.id));
     } finally {
@@ -135,9 +135,9 @@ function TreeCanvasInner() {
   }
 
   useEffect(() => {
+    if (!activeOrg) return;
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeOrg]);
 
   // ---- Node actions ----
   const onAddChild = useCallback(
@@ -269,6 +269,16 @@ function TreeCanvasInner() {
     },
     [getIntersectingNodes, setNodes]
   );
+
+  if (!activeOrg) {
+  return (
+    <OrgGate
+      onSuccess={(organization) => {
+        setActiveOrg(organization);
+      }}
+    />
+  );
+}
 
   if (loading) {
     return <div className="loading">Loading…</div>;

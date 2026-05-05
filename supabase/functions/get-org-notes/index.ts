@@ -20,16 +20,45 @@ Deno.serve(async (req) => {
     const supabase = createServiceClient();
     const session = await getValidSession(supabase, orgToken, "org");
 
-    const { data: posts, error } = await supabase
-      .from("posts")
+    const { data: trees, error: treesError } = await supabase
+      .from("trees")
       .select("*")
       .eq("organization_id", session.organization_id)
-      .eq("status", "published")
       .order("created_at", { ascending: true });
 
-    if (error) throw error;
+    if (treesError) throw treesError;
 
-    return jsonResponse({ posts });
+    const tree = trees?.[0] || null;
+
+    if (!tree) {
+      return jsonResponse({
+        tree: null,
+        nodes: [],
+        dependencies: [],
+      });
+    }
+
+    const { data: nodes, error: nodesError } = await supabase
+      .from("nodes")
+      .select("*")
+      .eq("tree_id", tree.id)
+      .order("created_at", { ascending: true });
+
+    if (nodesError) throw nodesError;
+
+    const { data: dependencies, error: dependenciesError } = await supabase
+      .from("dependencies")
+      .select("*")
+      .eq("tree_id", tree.id)
+      .order("created_at", { ascending: true });
+
+    if (dependenciesError) throw dependenciesError;
+
+    return jsonResponse({
+      tree,
+      nodes: nodes || [],
+      dependencies: dependencies || [],
+    });
   } catch (err) {
     return jsonResponse({ error: err.message || "Unexpected error" }, 500);
   }
