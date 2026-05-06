@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import ErrorMessage from "../../common/components/ErrorMessage";
-import { createEmptyPostForm } from "../../common/constants/postDefaults";
+import ErrorMessage from "../../../common/components/ErrorMessage";
+import { createEmptyPostForm } from "../../../common/constants/postDefaults";
 import RichTextEditor from "../components/editor/RichTextEditor";
 
-import AuthForm from "../../common/components/AuthForm";
+import AuthForm from "../../../common/components/AuthForm";
+import "../../styles/admin.css"
 
-import "../styles/admin.css";
-
-import AdminGate from "../../common/components/AdminGate";
-import OrgGate from "../../common/components/OrgGate";
-import { orgGateApi } from "../../api/orgGate";
+import AdminGate from "../../../common/components/AdminGate";
+import OrgGate from "../../../common/components/OrgGate";
+import { orgGateApi } from "../../../api/orgGate";
 
 export default function BlogCms() {
   const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());

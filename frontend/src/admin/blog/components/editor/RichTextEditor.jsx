@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
-import { uploadPostImage } from "../../../api/storage";
+import { uploadPostImage } from "../../../../api/storage";
 import "./editor.css";
 
 export default function RichTextEditor({ value, onChange }) {

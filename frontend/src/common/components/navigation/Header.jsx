@@ -1,34 +1,21 @@
-import { NavLink } from "react-router-dom";
-import { Home, BookOpen, Network, CheckSquare } from "lucide-react";
+import { useLocation, NavLink } from "react-router-dom";
+import NavIcon from "./NavIcon";
 import "./header.css";
 
-export default function Header() {
+export default function Header({links}) {
+  const location = useLocation();
+  const locationName = location.pathname;
+  
   return (
     <header className="floatingHeader">
       <nav className="navBar">
-        <NavLink to="/" className="navItem">
-          {({ isActive }) => (
-            <Home className={isActive ? "icon active" : "icon"} />
-          )}
-        </NavLink>
-
-        <NavLink to="/blog" className="navItem">
-          {({ isActive }) => (
-            <BookOpen className={isActive ? "icon active" : "icon"} />
-          )}
-        </NavLink>
-
-        <NavLink to="/notes" className="navItem">
-          {({ isActive }) => (
-            <Network className={isActive ? "icon active" : "icon"} />
-          )}
-        </NavLink>
-
-        <NavLink to="/tasks" className="navItem">
-          {({ isActive }) => (
-            <CheckSquare className={isActive ? "icon active" : "icon"} />
-          )}
-        </NavLink>
+        {links.map((link) => 
+          <NavLink to={link.location} className="navItem" key={link.title}>
+            {({ isActive }) => (
+              <NavIcon iconTitle={link.title} isActive={locationName === link.location} />
+            )}
+          </NavLink>
+        )}
       </nav>
     </header>
   );
