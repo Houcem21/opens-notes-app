@@ -20,7 +20,8 @@ export default function BlockNode({ id, data, selected }) {
       setValue(title || "");
       return;
     }
-    if (next !== title) onRename(id, next);
+    if (next !== title && typeof onRename === "function") onRename(id, next);
+
   }
 
   return (
@@ -28,32 +29,33 @@ export default function BlockNode({ id, data, selected }) {
       {/* Optional handles (not used for edges right now, but safe) */}
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-
-      <div className="blockHeader">
-        {!data.readOnly && (<button
-          className="iconBtn"
-          title="Add child"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddChild(id);
-          }}
-        >
-          +
-        </button>)}
-
-        {(!isRoot && !data.readOnly) && (
+      {!data.readOnly && (
+        <div className="blockHeader">
           <button
-            className="iconBtn danger"
-            title="Delete"
+            className="iconBtn"
+            title="Add child"
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(id);
+              onAddChild(id);
             }}
           >
-            ×
+            +
           </button>
-        )}
-      </div>
+
+          {!isRoot && (
+            <button
+              className="iconBtn danger"
+              title="Delete"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(id);
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="blockBody">
         {!editing ? (
@@ -61,10 +63,11 @@ export default function BlockNode({ id, data, selected }) {
             className="blockTitle"
             onDoubleClick={(e) => {
               e.stopPropagation();
+              if (data.readOnly) return;
               setEditing(true);
             }}
             onClick={(e) => e.stopPropagation()}
-            title="Double click to rename"
+            title={data.readOnly ? "Read" : "Double click to rename"}
           >
             {title || "Untitled"}
           </div>

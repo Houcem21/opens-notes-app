@@ -87,6 +87,7 @@ export const orgGateApi = {
     this.saveAdminSession(data);
     return data;
   },
+
   async getAdminPosts() {
     const adminToken = this.getAdminToken();
 
@@ -127,15 +128,42 @@ export const orgGateApi = {
   },
 
   
-// Notes
-
+  // Notes
   async getOrgNotes() {
-  const orgToken = this.getOrgToken();
+    const orgToken = this.getOrgToken();
 
-  if (!orgToken) {
-    throw new Error("Organization access required.");
-  }
+    if (!orgToken) {
+      throw new Error("Organization access required.");
+    }
 
-  return callFunction("get-org-notes", { orgToken });
-},
+    return callFunction("get-org-notes", { orgToken });
+  },
+
+  async saveAdminNode(node) {
+    const adminToken = this.getAdminToken();
+
+    if (!adminToken) {
+      throw new Error("Admin access required.");
+    }
+
+    const data = await callFunction("save-admin-node", {
+      adminToken,
+      node,
+    });
+
+    return data;
+  },
+
+  async deleteAdminNode(nodeId) {
+    const adminToken = this.getAdminToken();
+
+    if (!adminToken) {
+      throw new Error("Admin access required.");
+    }
+
+    return callFunction("delete-admin-node", {
+      adminToken,
+      nodeId,
+    });
+  },
 };

@@ -459,3 +459,25 @@ entrypoint = "./functions/get-org-notes/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/get-org-notes/*.html" ]
+
+[functions.save-admin-node]
+enabled = true
+verify_jwt = true
+import_map = "./functions/save-admin-node/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/save-admin-node/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/save-admin-node/*.html" ]
+
+[functions.delete-admin-node]
+enabled = true
+verify_jwt = true
+import_map = "./functions/delete-admin-node/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/delete-admin-node/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/delete-admin-node/*.html" ]
