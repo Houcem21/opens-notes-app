@@ -104,7 +104,7 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
 
   return (
     <div className="canvasShell">
-      <div className="sidebar">
+      <div className="sidebar" style={{background: "black"}}>
         <div className="sideTitle">{tree?.name || "Tree"}</div>
         <div className="sideMeta">{flowNodes.length} nodes</div>
         <div className="sideHint">
