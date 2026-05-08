@@ -160,8 +160,8 @@ export default function BlogCms() {
   if (!activeOrg) {
     return (
       <OrgGate
-        onSuccess={() => {
-          window.location.reload();
+        onSuccess={(organization) => {
+          setActiveOrg(organization)
         }}
       />
     );
@@ -219,10 +219,7 @@ export default function BlogCms() {
 
         <button
           className="btn btnSecondary logoutBtn"
-          onClick={() => {
-            orgGateApi.clearAdminSession();
-            window.location.reload();
-          }}
+          onClick={() => orgGateApi.logoutAdmin()}
         >
           Logout
         </button>

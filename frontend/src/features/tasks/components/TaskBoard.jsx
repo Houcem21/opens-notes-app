@@ -36,7 +36,7 @@ export default function TaskBoard() {
       setTasks(data.tasks || []);
     } catch (err) {
       setError(err.message);
-      orgGateApi.clearOrgSession();
+      orgGateApi.resetOrgSession();
       setActiveOrg(null);
     } finally {
       setLoading(false);

@@ -16,8 +16,8 @@ export default function AdminHome() {
   if (!activeOrg) {
     return (
       <OrgGate
-        onSuccess={() => {
-          window.location.reload();
+        onSuccess={(organization) => {
+          setActiveOrg(organization);
         }}
       />
     );

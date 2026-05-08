@@ -196,10 +196,7 @@ export default function AdminTaskBoard() {
 
         <button
           className="btn btnSecondary"
-          onClick={() => {
-            orgGateApi.clearAdminSession();
-            window.location.reload();
-          }}
+          onClick={() => orgGateApi.logoutAdmin()}
         >
           Logout Admin
         </button>

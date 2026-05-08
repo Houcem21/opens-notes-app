@@ -36,7 +36,7 @@ export default function BlogPage() {
         setPosts(data);
         if (data.length > 0) setSelectedPostId(data[0].id);
       } catch (err) {
-        orgGateApi.clearOrgSession();
+        orgGateApi.resetOrgSession();
         setActiveOrg(null);
         setError(err.message);
       }

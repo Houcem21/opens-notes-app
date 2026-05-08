@@ -60,4 +60,28 @@ export const orgSessionApi = {
     this.saveAdminSession(data);
     return data;
   },
+
+  getSessionState() {
+    return {
+      activeOrg: this.getActiveOrg(),
+      orgToken: this.getOrgToken(),
+      adminToken: this.getAdminToken(),
+      isOrgActive: Boolean(this.getOrgToken() && this.getActiveOrg()),
+      isAdminActive: Boolean(this.getAdminToken()),
+    };
+  },
+
+  resetOrgSession() {
+    this.clearOrgSession();
+  },
+
+  logoutAdmin() {
+    this.clearAdminSession();
+    window.location.reload();
+  },
+
+  logoutOrg() {
+    this.clearOrgSession();
+    window.location.href = "/";
+  },
 };

@@ -39,3 +39,16 @@
 .navItem:hover .icon {
   color: #111;
 }
+
+.activeOrgBadge {
+  padding: 7px 10px;
+  border-radius: 999px 0 0 999px;
+  background: rgba(202, 167, 74, 0.14);
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+}
