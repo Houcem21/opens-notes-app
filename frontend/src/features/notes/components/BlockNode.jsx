@@ -69,7 +69,6 @@ export default function BlockNode({ id, data, selected }) {
             onDoubleClick={(e) => {
               e.stopPropagation();
               if (!canEdit) return;
-              setEditing(true);
             }}
             onClick={(e) => e.stopPropagation()}
             title={data.readOnly ? "Read" : "Double click to rename"}

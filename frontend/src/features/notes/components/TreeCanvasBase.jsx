@@ -9,9 +9,12 @@ import ReactFlow, {
   useReactFlow,
 } from "reactflow";
 
-import "reactflow/dist/style.css";
+import NodeEditorModal from "./NodeEditorModal";
 
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
+
+
+import "reactflow/dist/style.css";
 import "../styles/notes.css";
 
 export default function TreeCanvasBase({
@@ -40,6 +43,15 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
 
   const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
+
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [activeNodeId, setActiveNodeId] = useState(null);
+
+  const activeNode = useMemo(
+    () => nodes.find((node) => node.id === activeNodeId) || null,
+    [nodes, activeNodeId]
+  );
+
   const nodesRef = useRef([]);
   const { getIntersectingNodes } = useReactFlow();
 
@@ -59,6 +71,53 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
 
     setEdges(nextEdges);
   }, [nodes, setEdges]);
+
+  const handleNodeDoubleClick = useCallback(
+    (event, node) => {
+      if (readOnly) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      setActiveNodeId(node.id);
+      setEditorOpen(true);
+    },
+    [readOnly]
+  );
+
+  const handleSaveNodeDetails = useCallback(
+    async ({ title, notes }) => {
+      if (readOnly || !activeNode || typeof onUpdateNode !== "function") return;
+
+      const saved = await onUpdateNode({
+        id: activeNode.id,
+        title,
+        notes,
+        parentId: activeNode.data?.parentId ?? null,
+        pos: activeNode.position || { x: 0, y: 0 },
+      });
+
+      const savedNode = saved.node || saved;
+
+      setNodes((current) =>
+        current.map((node) =>
+          node.id === activeNode.id
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  title: savedNode.title || title,
+                  notes: savedNode.notes || notes,
+                },
+              }
+            : node
+        )
+      );
+
+      setEditorOpen(false);
+    },
+    [readOnly, activeNode, onUpdateNode, setNodes]
+  );
 
   const handleAddChild = useCallback(
     async (parentId) => {
@@ -285,6 +344,7 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
             edgeTypes={EDGE_TYPES}
             fitView
             onNodeDragStop={readOnly ? undefined : handleNodeDragStop}
+            onNodeDoubleClick={readOnly ? undefined : handleNodeDoubleClick}
           >
             <Background />
             <Controls showInteractive={false} />
@@ -292,6 +352,14 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
           </ReactFlow>
         </div>
       </div>
+      {!readOnly && (
+        <NodeEditorModal
+          open={editorOpen}
+          node={activeNode}
+          onClose={() => setEditorOpen(false)}
+          onSave={handleSaveNodeDetails}
+        />
+      )}
     </div>
   );
 }
