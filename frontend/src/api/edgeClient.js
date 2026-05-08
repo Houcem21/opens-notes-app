@@ -21,3 +21,28 @@ export async function callFunction(path, body) {
 
   return data;
 }
+
+export async function callMultipartFunction(path, formData) {
+  if (!FUNCTIONS_BASE) {
+    throw new Error("Missing VITE_SUPABASE_FUNCTIONS_URL.");
+  }
+
+  const res = await fetch(`${FUNCTIONS_BASE}/${path}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json().catch(() => null);
+
+  console.log("Multipart response", {
+    path,
+    status: res.status,
+    data,
+  });
+
+  if (!res.ok) {
+    throw new Error(data?.error || `${res.status} ${res.statusText}`);
+  }
+
+  return data;
+}

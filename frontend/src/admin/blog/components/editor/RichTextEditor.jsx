@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
-import { uploadPostImage } from "../../../../api/storage";
+import { orgGateApi } from "../../../../api/orgGate";
 import "./editor.css";
 
 export default function RichTextEditor({ value, onChange }) {
@@ -48,22 +48,15 @@ export default function RichTextEditor({ value, onChange }) {
     editor.chain().focus().setLink({ href: url }).run();
   }
   async function insertImageFile(file) {
-    if (!file || !editor) return;
+    if (!file) return;
 
-    try {
-      setUploadingImage(true);
-      const imageUrl = await uploadPostImage(file);
+    const { url } = await orgGateApi.uploadAdminImage(file);
 
-      editor
-        .chain()
-        .focus()
-        .setImage({ src: imageUrl, alt: file.name })
-        .run();
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setUploadingImage(false);
-    }
+    editor
+      .chain()
+      .focus()
+      .setImage({ src: url })
+      .run();
   }
 
   async function handleImageInputChange(e) {
