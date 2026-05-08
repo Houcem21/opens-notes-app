@@ -1,5 +1,5 @@
 import { callMultipartFunction } from "./edgeClient";
-import { orgSessionApi } from "./orgSession";
+import { orgSessionApi } from "./sessionGateway";
 
 export const storageGateway = {
   async uploadAdminImage(file) {

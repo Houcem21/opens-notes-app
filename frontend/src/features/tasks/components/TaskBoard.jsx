@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import OrgGate from "../../../common/components/OrgGate";
 import ErrorMessage from "../../../common/components/ErrorMessage";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 import TaskColumn from "./TaskColumn";
 
 export default function TaskBoard() {

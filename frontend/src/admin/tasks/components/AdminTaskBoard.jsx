@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import OrgGate from "../../../common/components/OrgGate";
 import AdminGate from "../../../common/components/AdminGate";
 import ErrorMessage from "../../../common/components/ErrorMessage";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 import "../../../features/tasks/styles/tasks.css";
 
 export default function AdminTaskBoard() {

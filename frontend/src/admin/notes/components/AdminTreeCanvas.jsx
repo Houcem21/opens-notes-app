@@ -1,7 +1,7 @@
 import { useState } from "react";
 import OrgGate from "../../../common/components/OrgGate";
 import AdminGate from "../../../common/components/AdminGate";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 import TreeCanvasBase from "../../../features/notes/components/TreeCanvasBase";
 
 export default function AdminTreeCanvas() {

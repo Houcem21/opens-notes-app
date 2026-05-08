@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ErrorMessage from "./ErrorMessage";
-import { orgGateApi } from "../../api/orgGate";
+import { orgGateApi } from "../../api";
 
 export default function AdminGate({ onSuccess }) {
   const [adminCode, setAdminCode] = useState("");

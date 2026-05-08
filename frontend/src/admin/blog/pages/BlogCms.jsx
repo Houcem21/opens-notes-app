@@ -7,7 +7,7 @@ import "../../styles/admin.css"
 
 import AdminGate from "../../../common/components/AdminGate";
 import OrgGate from "../../../common/components/OrgGate";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 
 export default function BlogCms() {
   const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());

@@ -4,7 +4,7 @@ import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";
 
 import OrgGate from "../../../common/components/OrgGate";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 
 import SidebarToggleBtn from "../components/SidebarToggleBtn";
 

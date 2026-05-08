@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 import AdminGate from "../../../common/components/AdminGate";
 import OrgGate from "../../../common/components/OrgGate";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 
 
 export default function AdminHome() {

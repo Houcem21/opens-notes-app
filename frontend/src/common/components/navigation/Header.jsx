@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import NavIcon from "./NavIcon";
 import "./header.css";
-import { orgGateApi } from "../../../api/orgGate";
+import { orgGateApi } from "../../../api";
 
 export default function Header({links}) {
 const activeOrg = orgGateApi.getActiveOrg();
