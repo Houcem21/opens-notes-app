@@ -11,6 +11,7 @@ import "./styles/components.css";
 import "./styles/utilities.css";
 import "./index.css";
 
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>

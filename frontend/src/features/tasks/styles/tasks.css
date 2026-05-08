@@ -30,7 +30,7 @@
   cursor: pointer;
 }
 
-.tasksBoard {
+.taskBoard {
   display: grid;
   grid-template-columns: repeat(3, minmax(260px, 1fr));
   gap: 18px;
@@ -104,8 +104,6 @@
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-
-
 
 .taskColumn.dragOver {
   outline: 2px dashed #111;
@@ -191,4 +189,127 @@
 .taskEditDescription {
   min-height: 90px;
   resize: vertical;
+}
+
+@media (max-width: 900px) {
+  .taskBoard {
+    display: flex;
+    flex-direction: column;
+  }
+  .taskColumn {
+    width: 100%;
+  }
+}
+
+.adminTaskCreateForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin: 28px 0 18px;
+}
+
+.adminTaskCreateForm input {
+  height: 48px;
+}
+
+.taskBoard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.taskColumn {
+  min-height: 520px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--color-border);
+}
+
+.taskColumn h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.taskCard {
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.taskCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.taskCardHeader strong {
+  line-height: 1.25;
+}
+
+.taskDescription {
+  margin: 0 0 12px;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.priority {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.priority-high {
+  color: #ffb4b4;
+  background: rgba(255, 80, 80, 0.14);
+}
+
+.priority-medium {
+  color: #f3d58a;
+  background: rgba(202, 167, 74, 0.14);
+}
+
+.priority-low {
+  color: #a7e3bd;
+  background: rgba(80, 180, 110, 0.14);
+}
+
+.taskActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.taskCard .select,
+.taskCard .input,
+.taskCard .textarea {
+  width: 100%;
+  margin-top: 10px;
+}
+
+@media (max-width: 1100px) {
+  .taskBoard {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .adminTaskCreateForm {
+    grid-template-columns: 1fr;
+  }
+
+  .taskBoard {
+    grid-template-columns: 1fr;
+  }
 }

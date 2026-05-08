@@ -174,16 +174,12 @@
   background: rgba(20, 20, 20, 0.92);
   color: var(--color-gold);
   cursor: pointer;
-  font-size: 30px;
-  padding-bottom: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .blogSidebarClosed .blogSidebarToggle {
-  left: 18px;
-  padding-right: 3px;
   opacity: .8;
 }
 

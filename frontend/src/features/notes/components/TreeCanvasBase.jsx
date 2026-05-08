@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -6,6 +6,7 @@ import ReactFlow, {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  useReactFlow,
 } from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -39,6 +40,12 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
 
   const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
+  const nodesRef = useRef([]);
+  const { getIntersectingNodes } = useReactFlow();
+
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
 
   useEffect(() => {
     const nextEdges = nodes
@@ -52,6 +59,95 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
 
     setEdges(nextEdges);
   }, [nodes, setEdges]);
+
+  const handleAddChild = useCallback(
+    async (parentId) => {
+      if (readOnly || typeof onCreateNode !== "function") return;
+
+      const parent = nodesRef.current.find((node) => node.id === parentId);
+
+      const newPosition = {
+        x: (parent?.position?.x ?? 0) + 240,
+        y: (parent?.position?.y ?? 0) + 120,
+      };
+
+      const saved = await onCreateNode({
+        parentId,
+        title: "New",
+        notes: "",
+        pos: newPosition,
+      });
+
+      const savedNode = saved.node || saved;
+
+      setNodes((current) => [
+        ...current,
+        {
+          id: savedNode.id,
+          type: "block",
+          draggable: true,
+          position: newPosition,
+          data: {
+            title: savedNode.title,
+            notes: savedNode.notes || "",
+            isRoot: false,
+            treeId: saved.tree?.id || tree?.id,
+            parentId,
+            readOnly,
+          },
+        },
+      ]);
+    },
+    [readOnly, onCreateNode, setNodes, tree?.id]
+  );
+
+  const handleDelete = useCallback(
+    async (nodeId) => {
+      if (readOnly || typeof onDeleteNode !== "function") return;
+      if (!confirm("Delete this node?")) return;
+
+      await onDeleteNode(nodeId);
+
+      setNodes((current) => current.filter((node) => node.id !== nodeId));
+      setEdges((current) =>
+        current.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
+      );
+    },
+    [readOnly, onDeleteNode, setNodes, setEdges]
+  );
+
+  const handleRename = useCallback(
+    async (nodeId, title) => {
+      if (readOnly || typeof onUpdateNode !== "function") return;
+
+      const currentNode = nodesRef.current.find((node) => node.id === nodeId);
+
+      const saved = await onUpdateNode({
+        id: nodeId,
+        title,
+        notes: currentNode?.data?.notes || "",
+        parentId: currentNode?.data?.parentId ?? null,
+        pos: currentNode?.position || { x: 0, y: 0 },
+      });
+
+      const savedNode = saved.node || saved;
+
+      setNodes((current) =>
+        current.map((node) =>
+          node.id === nodeId
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  title: savedNode.title || title,
+                },
+              }
+            : node
+        )
+      );
+    },
+    [readOnly, onUpdateNode, setNodes]
+  );
 
   function toFlowNodes(apiNodes, treeId) {
     const rootId = apiNodes.find((node) => node.parent_id === null)?.id;
@@ -91,12 +187,68 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
     }
   }
 
+  const handleNodeDragStop = useCallback(
+    async (_event, draggedNode) => {
+      if (readOnly || typeof onUpdateNode !== "function") return;
+
+      const intersections = getIntersectingNodes(draggedNode).filter(
+        (node) => node.id !== draggedNode.id
+      );
+
+      const target = intersections[0] || null;
+
+      const nextParentId = target
+        ? target.id
+        : draggedNode.data?.parentId ?? null;
+
+      const saved = await onUpdateNode({
+        id: draggedNode.id,
+        title: draggedNode.data?.title || "Untitled",
+        notes: draggedNode.data?.notes || "",
+        parentId: nextParentId,
+        pos: draggedNode.position,
+      });
+
+      const savedNode = saved.node || saved;
+
+      setNodes((current) =>
+        current.map((node) =>
+          node.id === draggedNode.id
+            ? {
+                ...node,
+                position: draggedNode.position,
+                data: {
+                  ...node.data,
+                  title: savedNode.title || node.data.title,
+                  notes: savedNode.notes || node.data.notes,
+                  parentId: nextParentId,
+                },
+              }
+            : node
+        )
+      );
+    },
+    [readOnly, onUpdateNode, getIntersectingNodes, setNodes]
+  );
+
   useEffect(() => {
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadNotes]);
 
-  const flowNodes = useMemo(() => nodes, [nodes]);
+  const flowNodes = useMemo(() => {
+    return nodes.map((node) => ({
+      ...node,
+      draggable: !readOnly,
+      data: {
+        ...node.data,
+        readOnly,
+        onAddChild: handleAddChild,
+        onDelete: handleDelete,
+        onRename: handleRename,
+      },
+    }));
+  }, [nodes, readOnly, handleAddChild, handleDelete, handleRename]);
 
   if (loading) {
     return <div className="loading">Loading…</div>;
@@ -132,6 +284,7 @@ function TreeCanvasBaseInner({ loadNotes, readOnly, onCreateNode, onUpdateNode, 
             nodeTypes={NODE_TYPES}
             edgeTypes={EDGE_TYPES}
             fitView
+            onNodeDragStop={readOnly ? undefined : handleNodeDragStop}
           >
             <Background />
             <Controls showInteractive={false} />

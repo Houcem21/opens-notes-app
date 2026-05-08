@@ -9,6 +9,7 @@ export default function TaskColumn({
   onMoveTaskToColumn,
   onUpdateTask,
   onDeleteTask,
+  readOnly = false,
 }) {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
@@ -56,13 +57,14 @@ export default function TaskColumn({
           <TaskCard
             key={task.id}
             task={task}
+            readOnly={readOnly}
             onUpdate={onUpdateTask}
             onDelete={onDeleteTask}
           />
         ))}
       </div>
 
-      {canCreateTask && (
+      {!readOnly && canCreateTask && (
         <form className="newTaskForm" onSubmit={handleCreateTask}>
           <input
             value={newTaskTitle}

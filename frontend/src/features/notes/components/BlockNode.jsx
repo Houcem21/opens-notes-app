@@ -7,7 +7,7 @@ export default function BlockNode({ id, data, selected }) {
 
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(title || "");
-
+  const canEdit = !data.readOnly;
   // Keep input synced when node updates externally
   useMemo(() => {
     setValue(title || "");
@@ -16,12 +16,15 @@ export default function BlockNode({ id, data, selected }) {
   function commit() {
     const next = value.trim();
     setEditing(false);
+
     if (!next) {
       setValue(title || "");
       return;
     }
-    if (next !== title && typeof onRename === "function") onRename(id, next);
 
+    if (!data.readOnly && next !== title && typeof onRename === "function") {
+      onRename(id, next);
+    }
   }
 
   return (
@@ -31,18 +34,20 @@ export default function BlockNode({ id, data, selected }) {
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
       {!data.readOnly && (
         <div className="blockHeader">
-          <button
-            className="iconBtn"
-            title="Add child"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddChild(id);
-            }}
-          >
-            +
-          </button>
+          {typeof onAddChild === "function" && (
+            <button
+              className="iconBtn"
+              title="Add child"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddChild(id);
+              }}
+            >
+              +
+            </button>
+          )}
 
-          {!isRoot && (
+          {!isRoot && typeof onDelete === "function" && (
             <button
               className="iconBtn danger"
               title="Delete"
@@ -63,7 +68,7 @@ export default function BlockNode({ id, data, selected }) {
             className="blockTitle"
             onDoubleClick={(e) => {
               e.stopPropagation();
-              if (data.readOnly) return;
+              if (!canEdit) return;
               setEditing(true);
             }}
             onClick={(e) => e.stopPropagation()}

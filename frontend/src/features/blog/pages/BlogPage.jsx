@@ -6,6 +6,8 @@ import "../styles/blog.css";
 import OrgGate from "../../../common/components/OrgGate";
 import { orgGateApi } from "../../../api/orgGate";
 
+import SidebarToggleBtn from "../components/SidebarToggleBtn";
+
 export default function BlogPage() {
   const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
 
@@ -83,12 +85,7 @@ export default function BlogPage() {
 
   return (
     <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
-      <button
-        className="blogSidebarToggle"
-        onClick={() => setSidebarOpen((value) => !value)}
-      >
-        {sidebarOpen ? "‹" : "›"}
-      </button>
+      <SidebarToggleBtn fn={() => setSidebarOpen((value) => !value)} open={sidebarOpen} />
       <aside className="blogList">
         <h2 className="blogListTitle">Docs</h2>
 

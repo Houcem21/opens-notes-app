@@ -12,7 +12,7 @@ const NavIcon = ({iconTitle, isActive}) => {
         case "Admin Blog": return <BookOpenText className={isActive ? "icon active" : "icon"} />;
         case "Admin Notes": return <ChartNetwork className={isActive ? "icon active" : "icon"} />;
         case "Admin Tasks": return <ListTodo className={isActive ? "icon active" : "icon"} />;
-        
+        default: return null;
     }
 }
 

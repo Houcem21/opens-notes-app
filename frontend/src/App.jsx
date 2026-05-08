@@ -1,5 +1,5 @@
 // Tools
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 // Header
 import Header from "./common/components/navigation/Header";
@@ -8,6 +8,7 @@ import Header from "./common/components/navigation/Header";
 import AdminHome from "./admin/home/pages/AdminHome"
 import NotesAdmin from "./admin/notes/pages/NotesAdmin"
 import BlogCms from "./admin/blog/pages/BlogCms"
+import TasksAdmin from "./admin/tasks/pages/TasksAdmin";
 
 // Feature Pages
 import Home from "./features/home/pages/Home"
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/admin" element={<AdminHome />}>
                 <Route path="notes" element={<NotesAdmin />} />
                 <Route path="blog" element={<BlogCms />} />
+                <Route path="tasks" element={<TasksAdmin />} />
               </Route>
             </Routes>
         </main>

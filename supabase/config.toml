@@ -481,3 +481,36 @@ entrypoint = "./functions/delete-admin-node/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/delete-admin-node/*.html" ]
+
+[functions.get-org-tasks]
+enabled = true
+verify_jwt = true
+import_map = "./functions/get-org-tasks/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/get-org-tasks/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/get-org-tasks/*.html" ]
+
+[functions.delete-admin-task]
+enabled = true
+verify_jwt = true
+import_map = "./functions/delete-admin-task/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/delete-admin-task/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/delete-admin-task/*.html" ]
+
+[functions.save-admin-task]
+enabled = true
+verify_jwt = true
+import_map = "./functions/save-admin-task/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/save-admin-task/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/save-admin-task/*.html" ]

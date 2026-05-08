@@ -3,7 +3,6 @@ import ErrorMessage from "../../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../../common/constants/postDefaults";
 import RichTextEditor from "../components/editor/RichTextEditor";
 
-import AuthForm from "../../../common/components/AuthForm";
 import "../../styles/admin.css"
 
 import AdminGate from "../../../common/components/AdminGate";
@@ -149,7 +148,7 @@ export default function BlogCms() {
 
     try {
       setError("");
-      await orgGateApi.deletePost(selectedPost.id);
+      await orgGateApi.deleteAdminPost(selectedPost.id);
       await loadPosts();
       startNewPost();
     } catch (err) {

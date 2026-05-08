@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TASK_PRIORITIES } from "../../../common/constants/taskDefaults";
 
-export default function TaskCard({ task, onUpdate, onDelete }) {
+export default function TaskCard({ task, onUpdate, onDelete, readOnly=false }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     title: task.title || "",
@@ -75,12 +75,16 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
   return (
     <article
       className={`taskCard priority-${task.priority}`}
-      draggable
+      draggable={!readOnly}
       onDragStart={handleDragStart}
     >
       <div className="taskCardTop">
         <span className="priorityBadge">{task.priority}</span>
-        <button className="btn btnSecondary" onClick={() => setEditing(true)}>Edit</button>
+        {!readOnly && (
+          <button className="btn btnSecondary" onClick={() => setEditing(true)}>
+            Edit
+          </button>
+        )}
       </div>
 
       <h3>{task.title}</h3>
@@ -91,9 +95,11 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
 
       <div className="taskCardFooter">
         {task.dueDate && <span>{task.dueDate}</span>}
-        <button className="btn btnDanger" onClick={() => onDelete(task.id)}>
-          Delete
-        </button>
+        {!readOnly && (
+          <button className="btn btnDanger" onClick={() => onDelete(task.id)}>
+            Delete
+          </button>
+        )}
       </div>
     </article>
   );
