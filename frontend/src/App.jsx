@@ -19,6 +19,9 @@ import TasksPage from "./features/tasks/pages/TasksPage"
 // Links
 import { navList, adminNavList } from "./common/constants/linkDefaults";
 
+// Guards
+import AdminRouteGuard from "./common/components/AdminRouteGuard";
+import OrgRouteGuard from "./common/components/OrgRouteGuard";
 
 export default function App() {
   const location = useLocation();
@@ -30,11 +33,27 @@ export default function App() {
         <main className="appMain">
             <Routes>
               <Route index element={<Home />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/notes" element={<NotesPage />} />
-              <Route path="/tasks" element={<TasksPage />} />
-
-              <Route path="/admin" element={<AdminHome />}>
+              <Route path="/blog" element={<OrgRouteGuard>
+                  <BlogPage />
+                </OrgRouteGuard>} 
+              />
+              <Route path="/notes" element={
+                <OrgRouteGuard>
+                  <NotesPage />
+                </OrgRouteGuard>
+                } 
+              />
+              <Route path="/tasks" element={
+                <OrgRouteGuard>
+                  <TasksPage />
+                </OrgRouteGuard>
+                }
+              />
+              <Route path="/admin" element={
+                <AdminRouteGuard>
+                  <AdminHome />
+                </AdminRouteGuard>
+                }>
                 <Route path="notes" element={<NotesAdmin />} />
                 <Route path="blog" element={<BlogCms />} />
                 <Route path="tasks" element={<TasksAdmin />} />

@@ -1,38 +1,9 @@
-import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-
-import AdminGate from "../../../common/components/AdminGate";
-import OrgGate from "../../../common/components/OrgGate";
-import { orgGateApi } from "../../../api";
 
 
 export default function AdminHome() {
   const location = useLocation();
   const isAdminIndex = location.pathname === "/admin";
-  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
-  const [adminToken, setAdminToken] = useState(orgGateApi.getAdminToken());
-
-
-  if (!activeOrg) {
-    return (
-      <OrgGate
-        onSuccess={(organization) => {
-          setActiveOrg(organization);
-        }}
-      />
-    );
-  }
-
-  if (!adminToken) {
-    return (
-      <AdminGate
-        onSuccess={(token) => {
-          setAdminToken(token);
-        }}
-      />
-    );
-  }
-
 
 
   if (!isAdminIndex) {
@@ -64,6 +35,13 @@ export default function AdminHome() {
           <span>Manage organization tasks.</span>
         </Link>
       </div>
+
+      <button
+        className="btn btnSecondary logoutBtn"
+        onClick={() => orgGateApi.logoutAdmin()}
+      >
+        Logout
+      </button>
     </main>
   );
 }

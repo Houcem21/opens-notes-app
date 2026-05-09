@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import OrgGate from "../../../common/components/OrgGate";
-import AdminGate from "../../../common/components/AdminGate";
+
 import ErrorMessage from "../../../common/components/ErrorMessage";
+
 import { orgGateApi } from "../../../api";
+
 import "../../../features/tasks/styles/tasks.css";
 
 export default function AdminTaskBoard() {
-  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
-  const [adminToken, setAdminToken] = useState(orgGateApi.getAdminToken());
 
   const [board, setBoard] = useState(null);
   const [columns, setColumns] = useState([]);
@@ -18,7 +17,7 @@ export default function AdminTaskBoard() {
   const [draftTask, setDraftTask] = useState(null);
 
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(Boolean(activeOrg && adminToken));
+  const [loading, setLoading] = useState(true);
 
   const todoColumn = columns[0];
 
@@ -33,7 +32,6 @@ export default function AdminTaskBoard() {
   }, [columns, tasks]);
 
   async function loadBoard() {
-    if (!activeOrg || !adminToken) return;
 
     try {
       setError("");
@@ -53,7 +51,7 @@ export default function AdminTaskBoard() {
 
   useEffect(() => {
     loadBoard();
-  }, [activeOrg, adminToken]);
+  }, []);
 
   async function createTask(e) {
     e.preventDefault();
@@ -162,25 +160,6 @@ export default function AdminTaskBoard() {
     }
   }
 
-  if (!activeOrg) {
-    return (
-      <OrgGate
-        onSuccess={(organization) => {
-          setActiveOrg(organization);
-        }}
-      />
-    );
-  }
-
-  if (!adminToken) {
-    return (
-      <AdminGate
-        onSuccess={(token) => {
-          setAdminToken(token);
-        }}
-      />
-    );
-  }
 
   if (loading) {
     return <div className="page">Loading admin tasks...</div>;
@@ -193,13 +172,6 @@ export default function AdminTaskBoard() {
           <p className="tasksEyebrow">Admin Tasks</p>
           <h1>{board?.title || "Tasks"}</h1>
         </div>
-
-        <button
-          className="btn btnSecondary"
-          onClick={() => orgGateApi.logoutAdmin()}
-        >
-          Logout Admin
-        </button>
       </header>
 
       <ErrorMessage message={error} />

@@ -5,14 +5,9 @@ import RichTextEditor from "../components/editor/RichTextEditor";
 
 import "../../styles/admin.css"
 
-import AdminGate from "../../../common/components/AdminGate";
-import OrgGate from "../../../common/components/OrgGate";
 import { orgGateApi } from "../../../api";
 
 export default function BlogCms() {
-  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
-  const [adminToken, setAdminToken] = useState(orgGateApi.getAdminToken());
-
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [form, setForm] = useState(createEmptyPostForm());
@@ -29,8 +24,6 @@ export default function BlogCms() {
 
   async function loadPosts() {
     try {
-      if (!activeOrg || !adminToken) return;
-
       const data = await orgGateApi.getAdminPosts();
       setPosts(data);
     } catch (err) {
@@ -40,7 +33,7 @@ export default function BlogCms() {
 
   useEffect(() => {
     loadPosts();
-  }, [activeOrg, adminToken]);
+  }, []);
 
   function selectPost(post) {
     setSelectedPostId(post.id);
@@ -156,27 +149,6 @@ export default function BlogCms() {
     }
   }
 
-
-  if (!activeOrg) {
-    return (
-      <OrgGate
-        onSuccess={(organization) => {
-          setActiveOrg(organization)
-        }}
-      />
-    );
-  }
-
-  if (!adminToken) {
-    return (
-      <AdminGate
-        onSuccess={(token) => {
-          setAdminToken(token);
-        }}
-      />
-    );
-  }
-
   return (
     <div
       className={`editorShell ${!leftOpen ? "leftClosed" : ""} ${
@@ -216,13 +188,6 @@ export default function BlogCms() {
             </button>
           ))}
         </div>
-
-        <button
-          className="btn btnSecondary logoutBtn"
-          onClick={() => orgGateApi.logoutAdmin()}
-        >
-          Logout
-        </button>
       </aside>
 
       <main className="documentEditor">

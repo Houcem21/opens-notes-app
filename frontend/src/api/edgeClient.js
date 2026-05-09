@@ -1,11 +1,55 @@
+import { orgSessionApi } from "./sessionGateway";
+
 const FUNCTIONS_BASE = import.meta.env.VITE_SUPABASE_FUNCTIONS_URL;
 
-export async function callFunction(path, body) {
+function getFunctionUrl(path) {
   if (!FUNCTIONS_BASE) {
     throw new Error("Missing VITE_SUPABASE_FUNCTIONS_URL.");
   }
 
-  const res = await fetch(`${FUNCTIONS_BASE}/${path}`, {
+  return `${FUNCTIONS_BASE}/${path}`;
+}
+
+function handleSessionError(message) {
+  const normalizedMessage = String(message || "").toLowerCase();
+
+  if (normalizedMessage.includes("admin session expired")) {
+    orgSessionApi.clearAdminSession();
+    window.location.reload();
+    return true;
+  }
+
+  if (normalizedMessage.includes("org session expired")) {
+    orgSessionApi.clearOrgSession();
+    window.location.href = "/";
+    return true;
+  }
+
+  return false;
+}
+
+async function parseJsonResponse(response) {
+  return response.json().catch(() => null);
+}
+
+async function handleResponse(response) {
+  const data = await parseJsonResponse(response);
+
+  if (!response.ok) {
+    const message = data?.error || `${response.status} ${response.statusText}`;
+
+    if (handleSessionError(message)) {
+      return null;
+    }
+
+    throw new Error(message);
+  }
+
+  return data;
+}
+
+export async function callFunction(path, body) {
+  const response = await fetch(getFunctionUrl(path), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,36 +57,14 @@ export async function callFunction(path, body) {
     body: JSON.stringify(body),
   });
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    throw new Error(data?.error || `${res.status} ${res.statusText}`);
-  }
-
-  return data;
+  return handleResponse(response);
 }
 
 export async function callMultipartFunction(path, formData) {
-  if (!FUNCTIONS_BASE) {
-    throw new Error("Missing VITE_SUPABASE_FUNCTIONS_URL.");
-  }
-
-  const res = await fetch(`${FUNCTIONS_BASE}/${path}`, {
+  const response = await fetch(getFunctionUrl(path), {
     method: "POST",
     body: formData,
   });
 
-  const data = await res.json().catch(() => null);
-
-  console.log("Multipart response", {
-    path,
-    status: res.status,
-    data,
-  });
-
-  if (!res.ok) {
-    throw new Error(data?.error || `${res.status} ${res.statusText}`);
-  }
-
-  return data;
+  return handleResponse(response);
 }
