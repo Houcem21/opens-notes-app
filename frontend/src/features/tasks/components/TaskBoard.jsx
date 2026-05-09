@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import OrgGate from "../../../common/components/OrgGate";
 import ErrorMessage from "../../../common/components/ErrorMessage";
 import { orgGateApi } from "../../../api";
 import TaskColumn from "./TaskColumn";
 
 export default function TaskBoard() {
-  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
   const [board, setBoard] = useState(null);
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(Boolean(activeOrg));
+  const [loading, setLoading] = useState(Boolean(true));
   const [error, setError] = useState("");
 
   const tasksByColumn = useMemo(() => {
@@ -23,7 +21,6 @@ export default function TaskBoard() {
   }, [columns, tasks]);
 
   async function loadTasks() {
-    if (!activeOrg) return;
 
     try {
       setError("");
@@ -37,7 +34,6 @@ export default function TaskBoard() {
     } catch (err) {
       setError(err.message);
       orgGateApi.resetOrgSession();
-      setActiveOrg(null);
     } finally {
       setLoading(false);
     }
@@ -45,17 +41,8 @@ export default function TaskBoard() {
 
   useEffect(() => {
     loadTasks();
-  }, [activeOrg]);
+  }, []);
 
-  if (!activeOrg) {
-    return (
-      <OrgGate
-        onSuccess={(organization) => {
-          setActiveOrg(organization);
-        }}
-      />
-    );
-  }
 
   if (loading) {
     return <div className="page">Loading tasks...</div>;

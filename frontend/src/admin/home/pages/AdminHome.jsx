@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 
-
+import { orgGateApi } from "../../../api";
 export default function AdminHome() {
   const location = useLocation();
   const isAdminIndex = location.pathname === "/admin";

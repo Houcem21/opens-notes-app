@@ -73,16 +73,6 @@ export default function BlogPage() {
     );
   }
 
-  if (!activeOrg) {
-  return (
-    <OrgGate
-      onSuccess={(organization) => {
-        setActiveOrg(organization);
-      }}
-    />
-  );
-}
-
   return (
     <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
       <SidebarToggleBtn fn={() => setSidebarOpen((value) => !value)} open={sidebarOpen} />
@@ -92,7 +82,7 @@ export default function BlogPage() {
         <ErrorMessage message={error} />
 
         {posts.length === 0 && (
-          <p className="blogEmpty">No Posts.</p>
+          <p className="blogEmpty">Loading...</p>
         )}
 
         <ul className="blogListPosts">
