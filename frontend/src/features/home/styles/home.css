@@ -1,8 +1,6 @@
 .homePage {
   min-height: 100vh;
   padding: 64px;
-  background: #f4f4f4;
-  color: #111;
 }
 
 .homeHero {
@@ -42,10 +40,10 @@
 .homeCard {
   min-height: 260px;
   padding: 22px;
-  border: 1px solid #ddd;
-  border-radius: 18px;
-  background: white;
-  color: #111;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-light);
+  color: var(--color-text);
   text-decoration: none;
   display: flex;
   flex-direction: column;

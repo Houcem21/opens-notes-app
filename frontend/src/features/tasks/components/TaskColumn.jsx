@@ -1,79 +1,44 @@
-import { useState } from "react";
 import TaskCard from "./TaskCard";
 
 export default function TaskColumn({
   column,
   tasks,
-  canCreateTask,
-  onCreateTask,
-  onMoveTaskToColumn,
-  onUpdateTask,
+  editable = false,
+  columns = [],
+  onEditTask,
   onDeleteTask,
-  readOnly = false,
+  onMoveTask,
+  onDropTask,
 }) {
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  async function handleCreateTask(e) {
-    e.preventDefault();
-
-    const title = newTaskTitle.trim();
-    if (!title) return;
-
-    await onCreateTask(column.id, title);
-    setNewTaskTitle("");
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    setIsDragOver(true);
-  }
-
-  function handleDragLeave() {
-    setIsDragOver(false);
-  }
-
-  async function handleDrop(e) {
-    e.preventDefault();
-    setIsDragOver(false);
-
-    const taskId = e.dataTransfer.getData("taskId");
-    if (!taskId) return;
-
-    await onMoveTaskToColumn(taskId, column.id);
-  }
-
   return (
-    <section
-      className={`taskColumn ${isDragOver ? "dragOver" : ""}`}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
+    <section className="taskColumn"
+        onDragOver={(event) => {
+        if (!editable) return;
+        event.preventDefault();
+      }}
+      onDrop={(event) => {
+        if (!editable) return;
+
+        event.preventDefault();
+
+        const taskId = event.dataTransfer.getData("taskId");
+        if (!taskId) return;
+
+        onDropTask?.(taskId, column.id);
+      }}>
       <h2>{column.title}</h2>
 
-      <div className="taskList">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            readOnly={readOnly}
-            onUpdate={onUpdateTask}
-            onDelete={onDeleteTask}
-          />
-        ))}
-      </div>
-
-      {!readOnly && canCreateTask && (
-        <form className="newTaskForm" onSubmit={handleCreateTask}>
-          <input
-            value={newTaskTitle}
-            placeholder="New task..."
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-          />
-          <button className="btn" type="submit">Add</button>
-        </form>
-      )}
+      {tasks.map((task) => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          editable={editable}
+          columns={columns}
+          onEdit={onEditTask}
+          onDelete={onDeleteTask}
+          onMove={onMoveTask}
+        />
+      ))}
     </section>
   );
 }

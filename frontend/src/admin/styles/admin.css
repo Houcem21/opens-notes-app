@@ -16,7 +16,7 @@
   gap: 8px;
   padding: 22px;
   border: 1px solid var(--color-border);
-  border-radius: 18px;
+  border-radius: var(--radius-xl);
   background: var(--color-surface);
   text-decoration: none;
   color: inherit;
@@ -50,17 +50,17 @@
 
 .pageTab {
   padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 999px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-pill);
   background: white;
-  color: #111;
+  color: var(--color-text-dark);
   cursor: pointer;
 }
 
 .pageTab.active {
-  background: #111;
+  background: var(--color-text-dark);
   color: white;
-  border-color: #111;
+  border-color: var(--color-text-dark);
 }
 
 .editorShell {
@@ -130,7 +130,7 @@
   width: 38px;
   height: 38px;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(20, 20, 20, 0.92);
   color: var(--color-gold);
   cursor: pointer;
@@ -148,8 +148,7 @@
 }
 
 .postQueue {
-  border-right: 1px solid #ddd;
-  background: white;
+  border-right: 1px solid var(--color-border-light);
   display: flex;
   flex-direction: column;
 }
@@ -167,9 +166,9 @@
 
 .postQueueHeader button {
   padding: 9px 13px;
-  border: 1px solid #111;
-  border-radius: 8px;
-  background: #111;
+  border: 1px solid var(--color-text-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-text-dark);
   color: white;
   cursor: pointer;
 }
@@ -189,16 +188,16 @@
   gap: 4px;
   padding: 11px;
   margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   background: white;
-  color: #111;
+  color: var(--color-text-dark);
   cursor: pointer;
 }
 
 .postQueueItem.active {
-  border-color: #111;
-  background: #f0f0f0;
+  border-color: var(--color-text-dark);
+  background: var(--color-surface-light);
 }
 
 .postQueueItem span {
@@ -213,7 +212,7 @@
   font-size: 42px;
   font-weight: 800;
   outline: none;
-  color: #111;
+  color: var(--color-text-dark);
   padding-top: 32px;
 }
 
@@ -226,7 +225,7 @@
   font-size: 18px;
   line-height: 1.5;
   outline: none;
-  color: #555;
+  color: var(--color-muted-dark);
   margin-top: 8px;
 }
 
@@ -245,42 +244,40 @@
 
 .pageTab {
   padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 999px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-pill);
   background: white;
-  color: #111;
+  color: var(--color-text-dark);
   cursor: pointer;
 }
 
 .pageTab.active {
-  background: #111;
+  background: var(--color-text-dark);
   color: white;
-  border-color: #111;
+  border-color: var(--color-text-dark);
 }
 
 .pageDocument {
   margin-top: 22px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 14px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
   padding: 22px;
 }
 
 .pageTitleInput {
   width: 100%;
   border: none;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-border-light);
   padding-bottom: 12px;
   margin-bottom: 16px;
   font-size: 26px;
   font-weight: 700;
   outline: none;
-  color: #111;
+  color: var(--color-text-dark);
 }
 
 .editorSettings {
-  border-left: 1px solid #ddd;
-  background: white;
+  border-left: 1px solid var(--color-border-light);
   padding: 18px;
 }
 
@@ -298,13 +295,13 @@
 .settingsInput {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
 }
 
 .settingsDivider {
   height: 1px;
-  background: #ddd;
+  background: var(--color-border-light);
   margin: 22px 0;
 }
 
@@ -313,7 +310,7 @@
   max-width: 100%;
   height: auto;
   margin: 16px 0;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .editorShell.leftClosed {
@@ -361,7 +358,7 @@
   width: 38px;
   height: 38px;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(20, 20, 20, 0.92);
   color: var(--color-gold);
   cursor: pointer;

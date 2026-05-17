@@ -6,6 +6,7 @@ import "../styles/blog.css";
 import { orgGateApi } from "../../../api";
 import { useSession } from "../../../common/session/useSession";
 import SidebarToggleBtn from "../components/SidebarToggleBtn";
+import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 
 export default function BlogPage() {
 
@@ -13,7 +14,8 @@ export default function BlogPage() {
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
-
+  const [loading, setLoading] = useState(true);
+  
   const selectedPost =
     posts.find((post) => (post.id) === selectedPostId) || posts[0];
 
@@ -31,13 +33,16 @@ export default function BlogPage() {
     async function loadPosts() {
       try {
         setError("");
+        setLoading(true);
+
         const data = await orgGateApi.getOrgPosts();
         setPosts(data);
         if (data.length > 0) setSelectedPostId(data[0].id);
       } catch (err) {
-        orgGateApi.resetOrgSession();
         if (handleApiError(err)) return;
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -73,80 +78,83 @@ export default function BlogPage() {
   }
 
   return (
-    <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
-      <SidebarToggleBtn fn={() => setSidebarOpen((value) => !value)} open={sidebarOpen} />
-      <aside className="blogList">
-        <h2 className="blogListTitle">Docs</h2>
+    <>
+      <LoadingScreen visible={loading} />
 
-        <ErrorMessage message={error} />
+      {!loading && (
+        <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
+          <SidebarToggleBtn fn={() => setSidebarOpen((value) => !value)} open={sidebarOpen} />
+          <aside className="blogList">
+            <h2 className="blogListTitle">Docs</h2>
 
-        {posts.length === 0 && (
-          <p className="blogEmpty">Loading...</p>
-        )}
+            <ErrorMessage message={error} />
 
-        <ul className="blogListPosts">
-          {posts.map((post) => (
-            <li className="blogListPostsItem" key={post.id}>
-              <button
-                className={`blogListItem ${
-                  selectedPost?.id === post.id ? "active" : ""
-                }`}
-                onClick={() => selectPost(post)}
-              >
-                <strong>{post.title}</strong>
-                <span>{post.category}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
-
-      <main className="blogContent" ref={contentRef}>
-        {!selectedPost || !activePage ? (
-          <div className="blogPlaceholder">
-            <h1>Loading</h1>
-            <p>Just starting...</p>
-          </div>
-        ) : (
-          <article>
-            <div className="blogCategory">{selectedPost.category}</div>
-            <h1>{selectedPost.title}</h1>
-
-            {selectedPost.summary && (
-              <p className="blogSummary">{selectedPost.summary}</p>
+            {posts.length === 0 && (
+              <p className="blogEmpty">No Posts</p>
             )}
 
-            <div className="blogPageCounter">
-              Page {activePageIndex + 1} of {pages.length}
-            </div>
+            <ul className="blogListPosts">
+              {posts.map((post) => (
+                <li className="blogListPostsItem" key={post.id}>
+                  <button
+                    className={`blogListItem ${
+                      selectedPost?.id === post.id ? "active" : ""
+                    }`}
+                    onClick={() => selectPost(post)}
+                  >
+                    <strong>{post.title}</strong>
+                    <span>{post.category}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </aside>
 
-            <h2>{activePage.title}</h2>
+          <main className="blogContent" ref={contentRef}>
+            {!selectedPost || !activePage ? (
+              <p className="blogEmpty">No content available.</p>
+            ) : (
+            <article>
+              <div className="blogCategory">{selectedPost.category}</div>
+              <h1>{selectedPost.title}</h1>
 
-            <div
-              className="blogBody"
-              dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(activePage.content),
-              }}            
-            />
+              {selectedPost.summary && (
+                <p className="blogSummary">{selectedPost.summary}</p>
+              )}
 
-            <div className="blogPageControls">
-              <button
-                onClick={goPreviousPage}
-                disabled={activePageIndex === 0}
-              >
-                Previous
-              </button>
+              <div className="blogPageCounter">
+                Page {activePageIndex + 1} of {pages.length}
+              </div>
 
-              <button
-                onClick={goNextPage}
-                disabled={activePageIndex >= pages.length - 1}
-              >
-                Next
-              </button>
-            </div>
-          </article>
-        )}
-      </main>
-    </div>
+              <h2>{activePage.title}</h2>
+
+              <div
+                className="blogBody"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(activePage.content),
+                }}            
+              />
+
+              <div className="blogPageControls">
+                <button
+                  onClick={goPreviousPage}
+                  disabled={activePageIndex === 0}
+                >
+                  Previous
+                </button>
+
+                <button
+                  onClick={goNextPage}
+                  disabled={activePageIndex >= pages.length - 1}
+                >
+                  Next
+                </button>
+              </div>
+            </article>
+            )}
+          </main>
+        </div>
+      )}
+    </>
   );
 }

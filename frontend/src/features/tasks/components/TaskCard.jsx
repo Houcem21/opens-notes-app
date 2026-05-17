@@ -1,106 +1,78 @@
-import { useState } from "react";
-import { TASK_PRIORITIES } from "../../../common/constants/taskDefaults";
-
-export default function TaskCard({ task, onUpdate, onDelete, readOnly=false }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState({
-    title: task.title || "",
-    description: task.description || "",
-    priority: task.priority || "medium",
-  });
-
-  function handleDragStart(e) {
-    e.dataTransfer.setData("taskId", task.id);
-    e.dataTransfer.effectAllowed = "move";
-  }
-
-  async function saveChanges() {
-    const title = draft.title.trim();
-    if (!title) return;
-
-    await onUpdate(task.id, {
-      title,
-      description: draft.description,
-      priority: draft.priority,
-    });
-
-    setEditing(false);
-  }
-
-  if (editing) {
-    return (
-      <div className={`taskCard priority-${draft.priority}`}>
-        <input
-          className="taskEditTitle"
-          value={draft.title}
-          onChange={(e) =>
-            setDraft((current) => ({ ...current, title: e.target.value }))
-          }
-        />
-
-        <textarea
-          className="taskEditDescription"
-          value={draft.description}
-          placeholder="Description..."
-          onChange={(e) =>
-            setDraft((current) => ({
-              ...current,
-              description: e.target.value,
-            }))
-          }
-        />
-
-        <select
-          className="taskPrioritySelect"
-          value={draft.priority}
-          onChange={(e) =>
-            setDraft((current) => ({ ...current, priority: e.target.value }))
-          }
-        >
-          {TASK_PRIORITIES.map((priority) => (
-            <option key={priority} value={priority}>
-              {priority}
-            </option>
-          ))}
-        </select>
-
-        <div className="taskCardActions">
-          <button className="btn" onClick={saveChanges}>Save</button>
-          <button className="btn btnSecondary" onClick={() => setEditing(false)}>Cancel</button>
-        </div>
-      </div>
-    );
-  }
-
+export default function TaskCard({
+  task,
+  editable = false,
+  columns = [],
+  onEdit,
+  onDelete,
+  onMove,
+}) {
   return (
     <article
-      className={`taskCard priority-${task.priority}`}
-      draggable={!readOnly}
-      onDragStart={handleDragStart}
-    >
-      <div className="taskCardTop">
-        <span className="priorityBadge">{task.priority}</span>
-        {!readOnly && (
-          <button className="btn btnSecondary" onClick={() => setEditing(true)}>
-            Edit
-          </button>
-        )}
-      </div>
+        className="taskCard"
+        draggable={editable}
+        onDragStart={(event) => {
+          if (!editable) return;
+          event.dataTransfer.setData("taskId", task.id);
+          const ghost = document.createElement("div");
+          ghost.style.width = "1px";
+          ghost.style.height = "1px";
+          ghost.style.opacity = "0";
+          ghost.style.position = "absolute";
+          ghost.style.top = "-9999px";
 
-      <h3>{task.title}</h3>
+          document.body.appendChild(ghost);
+          event.dataTransfer.setDragImage(ghost, 0, 0);
+
+          setTimeout(() => {
+            document.body.removeChild(ghost);
+          }, 0);
+        }}
+      >
+      <div className="taskCardHeader">
+        <strong>{task.title}</strong>
+
+        <span className={`priority priority-${task.priority}`}>
+          {task.priority}
+        </span>
+      </div>
 
       {task.description && (
         <p className="taskDescription">{task.description}</p>
       )}
 
-      <div className="taskCardFooter">
-        {task.dueDate && <span>{task.dueDate}</span>}
-        {!readOnly && (
-          <button className="btn btnDanger" onClick={() => onDelete(task.id)}>
-            Delete
-          </button>
-        )}
-      </div>
+      {editable && (
+        <>
+          <select
+            className="select"
+            value={task.column_id}
+            onChange={(e) => onMove?.(task, e.target.value)}
+          >
+            {columns.map((column) => (
+              <option key={column.id} value={column.id}>
+                {column.title}
+              </option>
+            ))}
+          </select>
+
+          <div className="taskActions">
+            <button
+              className="btn btnSecondary"
+              type="button"
+              onClick={() => onEdit?.(task)}
+            >
+              Edit
+            </button>
+
+            <button
+              className="btn btnDanger"
+              type="button"
+              onClick={() => onDelete?.(task.id)}
+            >
+              Delete
+            </button>
+          </div>
+        </>
+      )}
     </article>
   );
 }

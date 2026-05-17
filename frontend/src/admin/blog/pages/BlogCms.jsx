@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import ErrorMessage from "../../../common/components/ErrorMessage";
 import { createEmptyPostForm } from "../../../common/constants/postDefaults";
-import RichTextEditor from "../components/editor/RichTextEditor";
+import PostDocumentEditor from "../components/PostDocumentEditor";
 
 import "../../styles/admin.css"
 
@@ -9,12 +8,18 @@ import { orgGateApi } from "../../../api";
 
 import {useSession} from "../../../common/session/useSession";
 
+import SplitEditorLayout from "../../../common/layout/SplitEditorLayout";
+import PostQueueSidebar from "../components/PostQueueSidebar";
+import PostSettingsPanel from "../components/PostSettingsPanel";
+import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+
 export default function BlogCms() {
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [form, setForm] = useState(createEmptyPostForm());
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const selectedPost = posts.find((post) => post.id === selectedPostId);
   const activePage = form.pages?.[activePageIndex];
@@ -23,15 +28,21 @@ export default function BlogCms() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
 
-  const { handleApiError } = useSession();
+  const { handleApiError, clearAdmin
+   } = useSession();
 
   async function loadPosts() {
     try {
+      setError("");
+      setLoading(true);
+
       const data = await orgGateApi.getAdminPosts();
       setPosts(data);
     } catch (err) {
       if (handleApiError(err)) return;
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -156,134 +167,48 @@ export default function BlogCms() {
   }
 
   return (
-    <div
-      className={`editorShell ${!leftOpen ? "leftClosed" : ""} ${
-        !rightOpen ? "rightClosed" : ""
-      }`}
-    >
-      <button
-        className="sidebarToggle leftToggle"
-        onClick={() => setLeftOpen((value) => !value)}
-      >
-        {leftOpen ? "‹" : "›"}
-      </button>
+    <>
+      <LoadingScreen visible={loading} />
 
-      <button
-        className="sidebarToggle rightToggle"
-        onClick={() => setRightOpen((value) => !value)}
-      >
-        {rightOpen ? "›" : "‹"}
-      </button>
-      <aside className="postQueue">
-        <div className="postQueueHeader">
-          <h2>Posts</h2>
-          <button className="btn" onClick={startNewPost}>New</button>
-        </div>
-
-        <div className="postQueueList">
-          {posts.map((post) => (
-            <button
-              key={post.id}
-              className={`postQueueItem ${
-                post.id === selectedPostId ? "active" : ""
-              }`}
-              onClick={() => selectPost(post)}
-            >
-              <strong>{post.title}</strong>
-              <span>{post.status}</span>
-            </button>
-          ))}
-        </div>
-      </aside>
-
-      <main className="documentEditor">
-        <ErrorMessage message={error} />
-
-        <input
-          className="documentTitle"
-          value={form.title}
-          placeholder="Untitled post"
-          onChange={(e) => updateField("title", e.target.value)}
-        />
-
-        <textarea
-          className="documentSummary"
-          value={form.summary}
-          placeholder="Short summary..."
-          onChange={(e) => updateField("summary", e.target.value)}
-        />
-
-        <div className="pageBar">
-          <div className="pageTabs">
-            {form.pages.map((page, index) => (
-              <button
-                key={index}
-                className={`pageTab ${index === activePageIndex ? "active" : ""}`}
-                onClick={() => setActivePageIndex(index)}
-              >
-                {page.title || `Page ${index + 1}`}
-              </button>
-            ))}
-          </div>
-
-          <button className="btn" onClick={addPage}>
-            + Page
-          </button>
-        </div>
-
-        {activePage && (
-          <section className="pageDocument">
-            <input
-              className="pageTitleInput"
-              value={activePage.title}
-              placeholder="Page title"
-              onChange={(e) => updateActivePage("title", e.target.value)}
+      {!loading && (
+        <SplitEditorLayout
+          leftOpen={leftOpen}
+          rightOpen={rightOpen}
+          onToggleLeft={() => setLeftOpen((value) => !value)}
+          onToggleRight={() => setRightOpen((value) => !value)}
+          left={
+            <PostQueueSidebar
+              posts={posts}
+              selectedPostId={selectedPostId}
+              onSelectPost={selectPost}
+              onCreatePost={startNewPost}
+              onLogout={clearAdmin}
             />
-
-            <RichTextEditor
-              value={activePage.content}
-              onChange={(html) => updateActivePage("content", html)}
+          }
+          main={
+            <PostDocumentEditor
+              error={error}
+              form={form}
+              activePage={activePage}
+              activePageIndex={activePageIndex}
+              onUpdateField={updateField}
+              onUpdateActivePage={updateActivePage}
+              onSelectPage={setActivePageIndex}
+              onAddPage={addPage}
             />
-          </section>
-        )}
-      </main>
-
-      <aside className="editorSettings">
-        <h2>Settings</h2>
-
-        <label className="settingsLabel">Status</label>
-        <select
-          className="settingsInput"
-          value={form.status}
-          onChange={(e) => updateField("status", e.target.value)}
-        >
-          <option value="draft">draft</option>
-          <option value="published">published</option>
-        </select>
-
-        <label className="settingsLabel">Category</label>
-        <input
-          className="settingsInput"
-          value={form.category}
-          onChange={(e) => updateField("category", e.target.value)}
+          }
+          right={
+            <PostSettingsPanel
+              form={form}
+              selectedPost={selectedPost}
+              onUpdateField={updateField}
+              onSavePost={savePost}
+              onDeletePage={deleteActivePage}
+              onDeletePost={deletePost}
+            />
+          }
         />
-
-        <div className="settingsDivider" />
-
-        <button className="btn savePostBtn" onClick={savePost}>
-          Save post
-        </button>
-
-        <button className="btn btnDanger" onClick={deleteActivePage}>
-          Delete current page
-        </button>
-
-        {selectedPost && (
-          <button className="btn btnDanger" onClick={deletePost}>
-            Delete post
-          </button>
-        )}
-      </aside>
-    </div>
+      )}
+    </>
   );
 }

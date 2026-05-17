@@ -1,7 +1,6 @@
 .tasksPage {
   min-height: 100vh;
-  padding: 24px;
-  background: #f4f5f7;
+  padding: var(--space-8);
 }
 
 .tasksHeader {
@@ -23,9 +22,9 @@
 .tasksHeader button,
 .newTaskForm button {
   padding: 9px 14px;
-  border: 1px solid #111;
-  border-radius: 8px;
-  background: #111;
+  border: 1px solid var(--color-text-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-text-dark);
   color: white;
   cursor: pointer;
 }
@@ -38,10 +37,13 @@
 }
 
 .taskColumn {
-  background: #ebecf0;
-  border-radius: 14px;
-  padding: 14px;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
   min-height: 420px;
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base);
 }
 
 .taskColumn h2 {
@@ -57,9 +59,9 @@
 
 .taskCard {
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
@@ -101,21 +103,21 @@
 .newTaskForm input {
   flex: 1;
   padding: 9px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
 }
 
 .taskColumn.dragOver {
-  outline: 2px dashed #111;
-  background: #dde3ee;
+  outline: 2px dashed var(--color-text-dark);
+  background: var(--color-surface-muted);
 }
 
 .taskCard {
   background: white;
-  border: 1px solid #ddd;
-  border-left: 5px solid #999;
-  border-radius: 12px;
-  padding: 12px;
+  border: 1px solid var(--color-border-light);
+  border-left: 5px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: grab;
 }
@@ -125,15 +127,15 @@
 }
 
 .taskCard.priority-high {
-  border-left-color: #b00020;
+  border-left-color: var(--color-danger-dark);
 }
 
 .taskCard.priority-medium {
-  border-left-color: #c57f00;
+  border-left-color: var(--color-warning);
 }
 
 .taskCard.priority-low {
-  border-left-color: #2f7d32;
+  border-left-color: var(--color-success);
 }
 
 .taskCardTop,
@@ -153,25 +155,25 @@
 .priorityBadge {
   font-size: 12px;
   padding: 3px 8px;
-  border-radius: 999px;
-  background: #f0f0f0;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-soft);
   text-transform: uppercase;
 }
 
 .taskDescription {
   margin: 8px 0 12px;
   font-size: 14px;
-  color: #444;
+  color: var(--color-muted-dark);
   line-height: 1.4;
 }
 
 .taskCard button,
 .taskCardActions button {
   padding: 6px 9px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
   background: white;
-  color: #111;
+  color: var(--color-text-dark);
   cursor: pointer;
 }
 
@@ -181,8 +183,8 @@
   width: 100%;
   margin-bottom: 8px;
   padding: 9px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
   font: inherit;
 }
 
@@ -221,8 +223,8 @@
 
 .taskColumn {
   min-height: 520px;
-  padding: 16px;
-  border-radius: 18px;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--color-border);
 }
@@ -233,9 +235,9 @@
 }
 
 .taskCard {
-  padding: 14px;
+  padding: var(--space-6);
   margin-bottom: 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
 }
@@ -263,7 +265,7 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -271,17 +273,17 @@
 }
 
 .priority-high {
-  color: #ffb4b4;
+  color: var(--color-danger);
   background: rgba(255, 80, 80, 0.14);
 }
 
 .priority-medium {
-  color: #f3d58a;
+  color: var(--color-gold);
   background: rgba(202, 167, 74, 0.14);
 }
 
 .priority-low {
-  color: #a7e3bd;
+  color: var(--color-success);
   background: rgba(80, 180, 110, 0.14);
 }
 
@@ -296,6 +298,14 @@
 .taskCard .textarea {
   width: 100%;
   margin-top: 10px;
+}
+
+.taskCard[draggable="true"] {
+  cursor: grab;
+}
+
+.taskCard[draggable="true"]:active {
+  cursor: grabbing;
 }
 
 @media (max-width: 1100px) {

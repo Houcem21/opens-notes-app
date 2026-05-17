@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 
   background: rgba(120, 120, 120, 0.25);
@@ -80,23 +80,23 @@
   width: 22px;
   height: 22px;
   flex: 0 0 auto;
-  color: #777;
+  color: var(--color-muted);
   transition:
     color 0.15s ease,
     transform 0.15s ease;
 }
 
 .icon.active {
-  color: #caa74a;
+  color: var(--color-gold);;
 }
 
 .navItem:hover .icon {
-  color: #111;
+  color: var(--color-text-dark);
 }
 
 .activeOrgBadge {
   padding: 7px 10px;
-  border-radius: 999px 0 0 999px;
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
   background: rgba(202, 167, 74, 0.14);
   color: var(--color-gold);
   font-size: 12px;

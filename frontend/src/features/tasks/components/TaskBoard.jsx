@@ -1,83 +1,49 @@
-import { useEffect, useMemo, useState } from "react";
-import ErrorMessage from "../../../common/components/ErrorMessage";
-import { orgGateApi } from "../../../api";
+import { useMemo } from "react";
 import TaskColumn from "./TaskColumn";
 
-import { useSession } from "../../../common/session/useSession";
+function groupTasksByColumn(columns, tasks) {
+  return columns.reduce((groups, column) => {
+    groups[column.id] = tasks
+      .filter((task) => task.column_id === column.id)
+      .sort((a, b) => a.position - b.position);
 
-export default function TaskBoard() {
-  const [board, setBoard] = useState(null);
-  const [columns, setColumns] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(Boolean(true));
-  const [error, setError] = useState("");
+    return groups;
+  }, {});
+}
 
-  const { handleApiError } = useSession();
+export default function TaskBoard({
+  columns = [],
+  tasks = [],
+  tasksByColumn,
+  editable = false,
+  onEditTask,
+  onDeleteTask,
+  onMoveTask,
+  onDropTask
+}) {
+  const groupedTasks = useMemo(() => {
+    return tasksByColumn || groupTasksByColumn(columns, tasks);
+  }, [columns, tasks, tasksByColumn]);
 
-  const tasksByColumn = useMemo(() => {
-    return columns.reduce((acc, column) => {
-      acc[column.id] = tasks
-        .filter((task) => task.column_id === column.id)
-        .sort((a, b) => a.position - b.position);
-
-      return acc;
-    }, {});
-  }, [columns, tasks]);
-
-  async function loadTasks() {
-
-    try {
-      setError("");
-      setLoading(true);
-
-      const data = await orgGateApi.getOrgTasks();
-
-      setBoard(data.board);
-      setColumns(data.columns || []);
-      setTasks(data.tasks || []);
-    } catch (err) {
-      orgGateApi.resetOrgSession();
-      if (handleApiError(err)) return;
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-
-  if (loading) {
-    return <div className="page">Loading tasks...</div>;
+  if (!columns.length) {
+    return <p className="mutedText">No task board available.</p>;
   }
 
   return (
-    <main className="tasksPage">
-      <header className="tasksHeader">
-        <div>
-          <p className="tasksEyebrow">Tasks</p>
-          <h1>{board?.title || "Tasks"}</h1>
-        </div>
-      </header>
-
-      <ErrorMessage message={error} />
-
-      {columns.length === 0 ? (
-        <p className="mutedText">No task board available for this organization.</p>
-      ) : (
-        <section className="taskBoard">
-          {columns.map((column) => (
-            <TaskColumn
-              key={column.id}
-              column={column}
-              tasks={tasksByColumn[column.id] || []}
-              readOnly
-            />
-          ))}
-        </section>
-      )}
-    </main>
+    <section className="taskBoard">
+      {columns.map((column) => (
+        <TaskColumn
+          key={column.id}
+          column={column}
+          tasks={groupedTasks[column.id] || []}
+          columns={columns}
+          editable={editable}
+          onEditTask={onEditTask}
+          onDeleteTask={onDeleteTask}
+          onMoveTask={onMoveTask}
+          onDropTask={onDropTask}
+        />
+      ))}
+    </section>
   );
 }

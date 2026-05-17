@@ -1,71 +1,70 @@
 .btn {
-  padding: 9px 14px;
-  border: 1px solid var(--color-text);
-  border-radius: var(--radius-sm);
-  background: var(--color-text);
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-strong);
+  color: var(--color-text);
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  background: var(--color-surface);
 }
 
 .btnSecondary {
-  background: white;
-  color: var(--color-text);
+  background: transparent;
 }
 
 .btnDanger {
-  background: var(--color-danger);
-  border-color: var(--color-danger);
-  color: white;
+  color: var(--color-danger);
+  border-color: rgba(239, 107, 107, 0.35);
 }
 
 .input,
 .textarea,
-.select {
+.select,
+.settingsInput {
   width: 100%;
-  padding: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: white;
-  color: var(--color-text);
-}
-
-.errorMessage {
-  padding: 10px;
-  border: 1px solid #ffb3b3;
-  background: #fff0f0;
-  color: var(--color-danger);
-  border-radius: var(--radius-sm);
-}
-
-.label {
-  display: block;
-  margin-top: var(--space-md);
-  margin-bottom: 6px;
-  font-weight: 700;
-}
-
-.authPage {
-  min-height: calc(100vh - var(--header-height));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-bg);
-  text-align: center;
-}
-
-.authCard {
-  width: 360px;
-  padding: var(--space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--space-3) var(--space-4);
+  outline: none;
 }
 
-.authSubmitButton {
-  width: 100%;
-  margin-top: var(--space-md);
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.panel,
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
 }
 
 .mutedText {
   color: var(--color-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  font-size: 12px;
+  font-weight: 800;
 }

@@ -1,12 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 
 import ErrorMessage from "../../../common/components/ErrorMessage";
-
-import { orgGateApi } from "../../../api";
 import { useSession } from "../../../common/session/useSession";
+import { orgGateApi } from "../../../api";
+
+import TaskBoard from "../../../features/tasks/components/TaskBoard";
+import AdminTaskHeader from "./AdminTaskHeader";
+import AdminTaskCreateForm from "./AdminTaskCreateForm";
+
+import {
+  createTaskDraft,
+  createNewTaskPayload,
+} from "../utils/taskDrafts";
+
 import "../../../features/tasks/styles/tasks.css";
+import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+
 
 export default function AdminTaskBoard() {
+  const { clearAdmin } = useSession();
 
   const [board, setBoard] = useState(null);
   const [columns, setColumns] = useState([]);
@@ -18,22 +30,24 @@ export default function AdminTaskBoard() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const { handleApiError } = useSession();
 
   const todoColumn = columns[0];
 
   const tasksByColumn = useMemo(() => {
-    return columns.reduce((acc, column) => {
-      acc[column.id] = tasks
+    return columns.reduce((groups, column) => {
+      groups[column.id] = tasks
         .filter((task) => task.column_id === column.id)
         .sort((a, b) => a.position - b.position);
 
-      return acc;
+      return groups;
     }, {});
   }, [columns, tasks]);
 
-  async function loadBoard() {
+  useEffect(() => {
+    loadBoard();
+  }, []);
 
+  async function loadBoard() {
     try {
       setError("");
       setLoading(true);
@@ -44,54 +58,40 @@ export default function AdminTaskBoard() {
       setColumns(data.columns || []);
       setTasks(data.tasks || []);
     } catch (err) {
-      if (handleApiError(err)) return;
-      setError(err.message);
+      setError(err.message || "Failed to load tasks.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    loadBoard();
-  }, []);
+  async function createTask(event) {
+    event.preventDefault();
 
-  async function createTask(e) {
-    e.preventDefault();
-
-    if (!todoColumn) return;
-    if (!newTaskTitle.trim()) return;
+    if (!todoColumn || !newTaskTitle.trim()) return;
 
     try {
       setError("");
 
       const todoTasks = tasksByColumn[todoColumn.id] || [];
 
-      const created = await orgGateApi.saveAdminTask({
-        title: newTaskTitle.trim(),
-        description: "",
-        priority: "medium",
-        columnId: todoColumn.id,
-        position: todoTasks.length,
-      });
+      const created = await orgGateApi.saveAdminTask(
+        createNewTaskPayload({
+          title: newTaskTitle,
+          columnId: todoColumn.id,
+          position: todoTasks.length,
+        })
+      );
 
       setTasks((current) => [...current, created]);
       setNewTaskTitle("");
     } catch (err) {
-      if (handleApiError(err)) return;
-      setError(err.message);
+      setError(err.message || "Failed to create task.");
     }
   }
 
   function startEditing(task) {
     setEditingTaskId(task.id);
-    setDraftTask({
-      id: task.id,
-      title: task.title || "",
-      description: task.description || "",
-      priority: task.priority || "medium",
-      columnId: task.column_id,
-      position: task.position || 0,
-    });
+    setDraftTask(createTaskDraft(task));
   }
 
   function cancelEditing() {
@@ -120,8 +120,7 @@ export default function AdminTaskBoard() {
 
       cancelEditing();
     } catch (err) {
-      if (handleApiError(err)) return;
-      setError(err.message);
+      setError(err.message || "Failed to save task.");
     }
   }
 
@@ -135,8 +134,7 @@ export default function AdminTaskBoard() {
 
       setTasks((current) => current.filter((task) => task.id !== taskId));
     } catch (err) {
-      if (handleApiError(err)) return;
-      setError(err.message);
+      setError(err.message || "Failed to delete task.");
     }
   }
 
@@ -161,152 +159,89 @@ export default function AdminTaskBoard() {
         current.map((item) => (item.id === saved.id ? saved : item))
       );
     } catch (err) {
-      if (handleApiError(err)) return;
-      setError(err.message);
+      setError(err.message || "Failed to move task.");
     }
   }
 
+  async function dropTask(taskId, targetColumnId) {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task) return;
 
-  if (loading) {
-    return <div className="page">Loading admin tasks...</div>;
+    await moveTask(task, targetColumnId);
   }
 
   return (
-    <main className="tasksPage">
-      <header className="tasksHeader">
-        <div>
-          <p className="tasksEyebrow">Admin Tasks</p>
-          <h1>{board?.title || "Tasks"}</h1>
-        </div>
-      </header>
+    <>
+      <LoadingScreen visible={loading} />
+      {!loading && (
+        <main className="tasksPage">
+          <AdminTaskHeader boardTitle={board?.title} onLogout={clearAdmin} />
 
-      <ErrorMessage message={error} />
+          <ErrorMessage message={error} />
 
-      {todoColumn && (
-        <form className="adminTaskCreateForm" onSubmit={createTask}>
-          <input
-            className="input"
+          <AdminTaskCreateForm
             value={newTaskTitle}
-            placeholder="New task..."
-            onChange={(e) => setNewTaskTitle(e.target.value)}
+            disabled={!todoColumn}
+            onChange={setNewTaskTitle}
+            onSubmit={createTask}
           />
-          <button className="btn" type="submit">
-            Add to To Do
-          </button>
-        </form>
-      )}
 
-      {columns.length === 0 ? (
-        <p className="mutedText">No task board available.</p>
-      ) : (
-        <section className="taskBoard">
-          {columns.map((column) => (
-            <section className="taskColumn" key={column.id}>
-              <h2>{column.title}</h2>
+          <TaskBoard
+            columns={columns}
+            tasksByColumn={tasksByColumn}
+            editable
+            onEditTask={startEditing}
+            onDeleteTask={deleteTask}
+            onMoveTask={moveTask}
+            onDropTask={dropTask}
+          />
 
-              {(tasksByColumn[column.id] || []).map((task) => {
-                const isEditing = editingTaskId === task.id;
+          {editingTaskId && draftTask && (
+            <section className="taskEditPanel card">
+              <h2>Edit Task</h2>
 
-                return (
-                  <article className="taskCard" key={task.id}>
-                    {isEditing ? (
-                      <>
-                        <input
-                          className="input"
-                          value={draftTask.title}
-                          onChange={(e) =>
-                            updateDraft("title", e.target.value)
-                          }
-                        />
+              <input
+                className="input"
+                value={draftTask.title}
+                onChange={(event) => updateDraft("title", event.target.value)}
+              />
 
-                        <textarea
-                          className="textarea"
-                          value={draftTask.description}
-                          placeholder="Description..."
-                          onChange={(e) =>
-                            updateDraft("description", e.target.value)
-                          }
-                        />
+              <textarea
+                className="textarea"
+                value={draftTask.description}
+                placeholder="Description..."
+                onChange={(event) =>
+                  updateDraft("description", event.target.value)
+                }
+              />
 
-                        <select
-                          className="select"
-                          value={draftTask.priority}
-                          onChange={(e) =>
-                            updateDraft("priority", e.target.value)
-                          }
-                        >
-                          <option value="high">high</option>
-                          <option value="medium">medium</option>
-                          <option value="low">low</option>
-                        </select>
+              <select
+                className="select"
+                value={draftTask.priority}
+                onChange={(event) => updateDraft("priority", event.target.value)}
+              >
+                <option value="high">high</option>
+                <option value="medium">medium</option>
+                <option value="low">low</option>
+              </select>
 
-                        <div className="taskActions">
-                          <button className="btn" type="button" onClick={saveTask}>
-                            Save
-                          </button>
-                          <button
-                            className="btn btnSecondary"
-                            type="button"
-                            onClick={cancelEditing}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="taskCardHeader">
-                        <strong>{task.title}</strong>
-                        <span className={`priority priority-${task.priority}`}>
-                            {task.priority}
-                        </span>
-                        </div>
+              <div className="taskActions">
+                <button className="btn" type="button" onClick={saveTask}>
+                  Save
+                </button>
 
-                        {task.description && (
-                        <p className="taskDescription">{task.description}</p>
-                        )}
-
-                        <select
-                          className="select"
-                          value={task.column_id}
-                          onChange={(e) => moveTask(task, e.target.value)}
-                        >
-                          {columns.map((columnOption) => (
-                            <option
-                              key={columnOption.id}
-                              value={columnOption.id}
-                            >
-                              {columnOption.title}
-                            </option>
-                          ))}
-                        </select>
-
-                        <div className="taskActions">
-                          <button
-                            className="btn btnSecondary"
-                            type="button"
-                            onClick={() => startEditing(task)}
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            className="btn btnDanger"
-                            type="button"
-                            onClick={() => deleteTask(task.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </article>
-                );
-              })}
+                <button
+                  className="btn btnSecondary"
+                  type="button"
+                  onClick={cancelEditing}
+                >
+                  Cancel
+                </button>
+              </div>
             </section>
-          ))}
-        </section>
+          )}
+        </main>
       )}
-    </main>
+    </> 
   );
 }
