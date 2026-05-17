@@ -17,19 +17,27 @@ import BlogPage from "./features/blog/pages/BlogPage"
 import TasksPage from "./features/tasks/pages/TasksPage"
 
 // Links
-import { navList, adminNavList } from "./common/constants/linkDefaults";
+import {getNavigationLinks} from "./common/navigation/getNavigationLinks";
+import { useSession } from "./common/session/useSession";
 
 // Guards
-import AdminRouteGuard from "./common/components/AdminRouteGuard";
-import OrgRouteGuard from "./common/components/OrgRouteGuard";
+import AdminRouteGuard from "./common/routing/AdminRouteGuard";
+import OrgRouteGuard from "./common/routing/OrgRouteGuard";
 
 export default function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const { hasActiveOrg, hasAdminToken } = useSession();
+
+  const links = getNavigationLinks({
+    isAdmin,
+    hasActiveOrg,
+    hasAdminToken
+  });
 
   return (
     <div className="appShell">
-      <Header links={isAdmin ? adminNavList : navList} />
+      <Header links={links} />
         <main className="appMain">
             <Routes>
               <Route index element={<Home />} />

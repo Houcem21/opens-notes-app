@@ -1,4 +1,4 @@
-import { orgSessionApi } from "./sessionGateway";
+import { ApiSessionError } from "./ApiSessionError";
 
 const FUNCTIONS_BASE = import.meta.env.VITE_SUPABASE_FUNCTIONS_URL;
 
@@ -10,22 +10,18 @@ function getFunctionUrl(path) {
   return `${FUNCTIONS_BASE}/${path}`;
 }
 
-function handleSessionError(message) {
+function createApiError(message) {
   const normalizedMessage = String(message || "").toLowerCase();
 
   if (normalizedMessage.includes("admin session expired")) {
-    orgSessionApi.clearAdminSession();
-    window.location.reload();
-    return true;
+    return new ApiSessionError(message, "admin");
   }
 
   if (normalizedMessage.includes("org session expired")) {
-    orgSessionApi.clearOrgSession();
-    window.location.href = "/";
-    return true;
+    return new ApiSessionError(message, "org");
   }
 
-  return false;
+  return new Error(message);
 }
 
 async function parseJsonResponse(response) {
@@ -37,12 +33,7 @@ async function handleResponse(response) {
 
   if (!response.ok) {
     const message = data?.error || `${response.status} ${response.statusText}`;
-
-    if (handleSessionError(message)) {
-      return null;
-    }
-
-    throw new Error(message);
+    throw createApiError(message);
   }
 
   return data;

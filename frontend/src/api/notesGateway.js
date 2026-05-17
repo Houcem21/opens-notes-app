@@ -1,39 +1,23 @@
 import { callFunction } from "./edgeClient";
-import { orgSessionApi } from "./sessionGateway";
+import { requireAdminToken, requireOrgToken } from "./authTokens";
 
 export const notesGateway = {
-  async getOrgNotes() {
-    const orgToken = orgSessionApi.getOrgToken();
-
-    if (!orgToken) {
-      throw new Error("Organization access required.");
-    }
-
-    return callFunction("get-org-notes", { orgToken });
+  getOrgNotes() {
+    return callFunction("get-org-notes", {
+      orgToken: requireOrgToken(),
+    });
   },
 
-  async saveAdminNode(node) {
-    const adminToken = orgSessionApi.getAdminToken();
-
-    if (!adminToken) {
-      throw new Error("Admin access required.");
-    }
-
+  saveAdminNode(node) {
     return callFunction("save-admin-node", {
-      adminToken,
+      adminToken: requireAdminToken(),
       node,
     });
   },
 
-  async deleteAdminNode(nodeId) {
-    const adminToken = orgSessionApi.getAdminToken();
-
-    if (!adminToken) {
-      throw new Error("Admin access required.");
-    }
-
+  deleteAdminNode(nodeId) {
     return callFunction("delete-admin-node", {
-      adminToken,
+      adminToken: requireAdminToken(),
       nodeId,
     });
   },

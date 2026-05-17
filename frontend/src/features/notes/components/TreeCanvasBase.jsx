@@ -13,6 +13,7 @@ import NodeEditorModal from "./NodeEditorModal";
 
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 
+import { useSession } from "../../../common/session/useSession";
 
 import "reactflow/dist/style.css";
 import "../styles/notes.css";

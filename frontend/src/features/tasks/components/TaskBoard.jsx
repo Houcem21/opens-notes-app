@@ -3,12 +3,16 @@ import ErrorMessage from "../../../common/components/ErrorMessage";
 import { orgGateApi } from "../../../api";
 import TaskColumn from "./TaskColumn";
 
+import { useSession } from "../../../common/session/useSession";
+
 export default function TaskBoard() {
   const [board, setBoard] = useState(null);
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(Boolean(true));
   const [error, setError] = useState("");
+
+  const { handleApiError } = useSession();
 
   const tasksByColumn = useMemo(() => {
     return columns.reduce((acc, column) => {
@@ -32,8 +36,9 @@ export default function TaskBoard() {
       setColumns(data.columns || []);
       setTasks(data.tasks || []);
     } catch (err) {
-      setError(err.message);
       orgGateApi.resetOrgSession();
+      if (handleApiError(err)) return;
+      setError(err.message);
     } finally {
       setLoading(false);
     }

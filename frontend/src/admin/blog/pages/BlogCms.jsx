@@ -7,6 +7,8 @@ import "../../styles/admin.css"
 
 import { orgGateApi } from "../../../api";
 
+import {useSession} from "../../../common/session/useSession";
+
 export default function BlogCms() {
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
@@ -21,12 +23,14 @@ export default function BlogCms() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
 
+  const { handleApiError } = useSession();
 
   async function loadPosts() {
     try {
       const data = await orgGateApi.getAdminPosts();
       setPosts(data);
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }
@@ -131,6 +135,7 @@ export default function BlogCms() {
       setSelectedPostId(savedPost.id);
       setForm(savedPost);
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }
@@ -145,6 +150,7 @@ export default function BlogCms() {
       await loadPosts();
       startNewPost();
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }

@@ -8,7 +8,7 @@ const NavIcon = ({iconTitle, isActive}) => {
         case "Blog": return <BookOpen className={isActive ? "icon active" : "icon"} />;
         case "Notes": return <Network className={isActive ? "icon active" : "icon"} />;
         case "Tasks": return <CheckSquare className={isActive ? "icon active" : "icon"} />;
-        case "Admin Home": return <Hammer className={isActive ? "icon active" : "icon"} />;
+        case "Admin": return <Hammer className={isActive ? "icon active" : "icon"} />;
         case "Admin Blog": return <BookOpenText className={isActive ? "icon active" : "icon"} />;
         case "Admin Notes": return <ChartNetwork className={isActive ? "icon active" : "icon"} />;
         case "Admin Tasks": return <ListTodo className={isActive ? "icon active" : "icon"} />;

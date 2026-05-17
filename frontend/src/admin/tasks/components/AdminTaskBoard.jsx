@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import ErrorMessage from "../../../common/components/ErrorMessage";
 
 import { orgGateApi } from "../../../api";
-
+import { useSession } from "../../../common/session/useSession";
 import "../../../features/tasks/styles/tasks.css";
 
 export default function AdminTaskBoard() {
@@ -18,6 +18,7 @@ export default function AdminTaskBoard() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const { handleApiError } = useSession();
 
   const todoColumn = columns[0];
 
@@ -43,6 +44,7 @@ export default function AdminTaskBoard() {
       setColumns(data.columns || []);
       setTasks(data.tasks || []);
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     } finally {
       setLoading(false);
@@ -75,6 +77,7 @@ export default function AdminTaskBoard() {
       setTasks((current) => [...current, created]);
       setNewTaskTitle("");
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }
@@ -117,6 +120,7 @@ export default function AdminTaskBoard() {
 
       cancelEditing();
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }
@@ -131,6 +135,7 @@ export default function AdminTaskBoard() {
 
       setTasks((current) => current.filter((task) => task.id !== taskId));
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }
@@ -156,6 +161,7 @@ export default function AdminTaskBoard() {
         current.map((item) => (item.id === saved.id ? saved : item))
       );
     } catch (err) {
+      if (handleApiError(err)) return;
       setError(err.message);
     }
   }

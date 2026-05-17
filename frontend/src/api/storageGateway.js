@@ -1,16 +1,11 @@
 import { callMultipartFunction } from "./edgeClient";
-import { orgSessionApi } from "./sessionGateway";
+import { requireAdminToken } from "./authTokens";
 
 export const storageGateway = {
-  async uploadAdminImage(file) {
-    const adminToken = orgSessionApi.getAdminToken();
-
-    if (!adminToken) {
-      throw new Error("Admin access required.");
-    }
-
+  uploadAdminImage(file) {
     const formData = new FormData();
-    formData.append("adminToken", adminToken);
+
+    formData.append("adminToken", requireAdminToken());
     formData.append("file", file, file.name);
 
     return callMultipartFunction("upload-admin-image", formData);

@@ -3,13 +3,11 @@ import ErrorMessage from "../../../common/components/ErrorMessage";
 import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";
 
-import OrgGate from "../../../common/components/OrgGate";
 import { orgGateApi } from "../../../api";
-
+import { useSession } from "../../../common/session/useSession";
 import SidebarToggleBtn from "../components/SidebarToggleBtn";
 
 export default function BlogPage() {
-  const [activeOrg, setActiveOrg] = useState(orgGateApi.getActiveOrg());
 
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState(null);
@@ -22,14 +20,15 @@ export default function BlogPage() {
   const pages = selectedPost?.pages || [];
   const activePage = pages[activePageIndex];
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const contentRef = useRef(null);
+    
+  const { handleApiError } = useSession();
+
 
   useEffect(() => {
     async function loadPosts() {
-      if (!activeOrg) return;
-
       try {
         setError("");
         const data = await orgGateApi.getOrgPosts();
@@ -37,13 +36,13 @@ export default function BlogPage() {
         if (data.length > 0) setSelectedPostId(data[0].id);
       } catch (err) {
         orgGateApi.resetOrgSession();
-        setActiveOrg(null);
+        if (handleApiError(err)) return;
         setError(err.message);
       }
     }
 
     loadPosts();
-  }, [activeOrg]);
+  }, []);
 
   function scrollBlogToTop() {
     requestAnimationFrame(() => {
