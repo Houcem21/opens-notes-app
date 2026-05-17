@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
+import HomeMouseGlow from "../components/HomeMouseGlow";
+
 import "../styles/home.css";
 
 export default function Home() {
   return (
     <main className="homePage">
+      <HomeMouseGlow />
       <section className="homeHero">
         <p className="homeEyebrow">Internal CRM</p>
         <h1>Team Knowledge & Onboarding Hub</h1>

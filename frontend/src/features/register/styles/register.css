@@ -1,0 +1,57 @@
+.registerPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-8);
+  background:
+    radial-gradient(circle at top, rgba(202, 167, 74, 0.12), transparent 34%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+.registerCard {
+  width: min(100%, 520px);
+  padding: var(--space-9);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+}
+
+.registerEyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.registerIntro {
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.registerForm {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+
+.registerForm label {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.registerSuccess {
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(202, 167, 74, 0.35);
+  background: rgba(202, 167, 74, 0.08);
+}
+
+.errorText {
+  color: var(--color-danger);
+}

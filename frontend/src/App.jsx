@@ -15,6 +15,8 @@ import Home from "./features/home/pages/Home"
 import NotesPage from "./features/notes/pages/NotesPage"
 import BlogPage from "./features/blog/pages/BlogPage"
 import TasksPage from "./features/tasks/pages/TasksPage"
+import RegisterPage from "./features/register/pages/RegisterPage";
+import ConfirmRegistrationPage from "./features/register/pages/ConfirmRegistrationPage";
 
 // Links
 import {getNavigationLinks} from "./common/navigation/getNavigationLinks";
@@ -41,6 +43,9 @@ export default function App() {
         <main className="appMain">
             <Routes>
               <Route index element={<Home />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register/confirm" element={<ConfirmRegistrationPage />} />
+              
               <Route path="/blog" element={<OrgRouteGuard>
                   <BlogPage />
                 </OrgRouteGuard>} 
@@ -65,6 +70,7 @@ export default function App() {
                 <Route path="notes" element={<NotesAdmin />} />
                 <Route path="blog" element={<BlogCms />} />
                 <Route path="tasks" element={<TasksAdmin />} />
+                
               </Route>
             </Routes>
         </main>
