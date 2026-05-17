@@ -2,9 +2,16 @@ import { callFunction } from "./edgeClient";
 import { requireAdminToken, requireOrgToken } from "./authTokens";
 
 export const notesGateway = {
-  getOrgNotes() {
+  getOrgTrees() {
+    return callFunction("get-org-trees", {
+      orgToken: requireOrgToken(),
+    });
+  },
+
+  getOrgNotes(treeId = null) {
     return callFunction("get-org-notes", {
       orgToken: requireOrgToken(),
+      treeId,
     });
   },
 

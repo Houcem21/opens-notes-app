@@ -1,7 +1,6 @@
-import TreeCanvas from "../components/TreeCanvas";
+import NotesWorkspace from "../components/NotesWorkspace";
+import "../styles/notes.css";
 
-const NotesPage = () => {
-  return <TreeCanvas />;
-};
-
-export default NotesPage;
+export default function NotesPage() {
+  return <NotesWorkspace readOnly />;
+}

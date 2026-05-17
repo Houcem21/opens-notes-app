@@ -161,12 +161,6 @@ function TreeCanvasBaseInner({
       <LoadingScreen visible={loading} />
       {!loading && (
         <div className="canvasShell">
-          <CanvasSidebar
-            title={tree?.name}
-            nodeCount={flowNodes.length}
-            readOnly={readOnly}
-          />
-
           <div className="canvas">
             <div className="rf">
               <ReactFlow

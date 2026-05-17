@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { orgToken } = await req.json();
+    const { orgToken, treeId } = await req.json();
 
     if (!orgToken || typeof orgToken !== "string") {
       return jsonResponse({ error: "Org token is required" }, 400);
@@ -20,15 +20,21 @@ Deno.serve(async (req) => {
     const supabase = createServiceClient();
     const session = await getValidSession(supabase, orgToken, "org");
 
-    const { data: trees, error: treesError } = await supabase
+    let treeQuery = supabase
       .from("trees")
       .select("*")
-      .eq("organization_id", session.organization_id)
-      .order("created_at", { ascending: true });
+      .eq("organization_id", session.organization_id);
 
-    if (treesError) throw treesError;
+    if (treeId) {
+      treeQuery = treeQuery.eq("id", treeId);
+    }
 
-    const tree = trees?.[0] || null;
+    const { data: tree, error: treeError } = await treeQuery
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (treeError) throw treeError;
 
     if (!tree) {
       return jsonResponse({

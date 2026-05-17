@@ -38,14 +38,15 @@
   gap: 4px;
   padding: 12px;
   margin-bottom: 10px;
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-text-dark);
   border-radius: var(--radius-md);
   background: var(--color-bg-grey);
   cursor: pointer;
+  color: var(--color-text)
 }
 
 .blogListItem.active {
-  border-color: var(--color-text-dark);
+  border-color: var(--color-border-light);
   background: var(--color-bg);
 }
 
