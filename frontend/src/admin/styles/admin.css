@@ -190,14 +190,14 @@
   margin-bottom: 10px;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
-  background: white;
-  color: var(--color-text-dark);
+  background: var(--color-bg-dark);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .postQueueItem.active {
   border-color: var(--color-text-dark);
-  background: var(--color-surface-light);
+  background: var(--color-bg-grey);
 }
 
 .postQueueItem span {
@@ -246,15 +246,15 @@
   padding: 8px 12px;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-pill);
-  background: white;
-  color: var(--color-text-dark);
+  background: var(--color-bg-dark);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .pageTab.active {
-  background: var(--color-text-dark);
+  background: var(--color-bg-grey);
   color: white;
-  border-color: var(--color-text-dark);
+  border-color: var(--color-text);
 }
 
 .pageDocument {
@@ -273,7 +273,8 @@
   font-size: 26px;
   font-weight: 700;
   outline: none;
-  color: var(--color-text-dark);
+  color: var(--color-text);
+  background-color: var(--color-bg);
 }
 
 .editorSettings {
@@ -421,6 +422,7 @@
   .editorSettings {
     border-left: none;
     border-top: 1px solid var(--color-border);
+    padding-bottom: 70px;
   }
 
   .documentEditor {

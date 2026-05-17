@@ -218,15 +218,73 @@
   backdrop-filter: blur(16px);
 }
 
+.notesSidebarHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
 .notesSidebarMode {
   margin-top: var(--space-3);
   color: var(--color-muted);
   font-size: 13px;
 }
 
-.notesSidebarHeader {
-  margin-bottom: var(--space-8);
+.notesGraphItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
 }
+
+.notesGraphContent {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.notesGraphContent strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notesGraphContent small {
+  color: var(--color-muted);
+}
+
+.notesGraphActions {
+  display: flex;
+  gap: var(--space-2);
+  opacity: 0;
+  transform: translateX(4px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.notesGraphItem:hover .notesGraphActions,
+.notesGraphItem.active .notesGraphActions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notesGraphActions span {
+  font-size: 12px;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.notesGraphActions span:hover {
+  color: var(--color-text);
+}
+
+.dangerText {
+  color: var(--color-danger) !important;
+}
+
 
 .notesEyebrow,
 .notesEmptyEyebrow {

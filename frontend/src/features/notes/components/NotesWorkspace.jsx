@@ -5,95 +5,158 @@ import NotesSidebar from "./NotesSidebar";
 import TreeCanvasBase from "./TreeCanvasBase";
 
 export default function NotesWorkspace({ readOnly = true }) {
-  const [trees, setTrees] = useState([]);
-  const [activeTreeId, setActiveTreeId] = useState(null);
-  const [treeData, setTreeData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [treeLoading, setTreeLoading] = useState(false);
-  const [error, setError] = useState("");
+    const [trees, setTrees] = useState([]);
+    const [activeTreeId, setActiveTreeId] = useState(null);
+    const [treeData, setTreeData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [treeLoading, setTreeLoading] = useState(false);
+    const [error, setError] = useState("");
 
-  async function loadWorkspace() {
-    try {
-      setError("");
-      setLoading(true);
+    async function loadWorkspace() {
+        try {
+        setError("");
+        setLoading(true);
 
-      const data = await orgGateApi.getOrgTrees();
-      const nextTrees = data.trees || [];
+        const data = await orgGateApi.getOrgTrees();
+        const nextTrees = data.trees || [];
 
-      setTrees(nextTrees);
+        setTrees(nextTrees);
 
-      if (nextTrees.length > 0) {
-        setActiveTreeId(nextTrees[0].id);
-      }
-    } catch (err) {
-      setError(err.message || "Failed to load graphs.");
-    } finally {
-      setLoading(false);
+        if (nextTrees.length > 0) {
+            setActiveTreeId(nextTrees[0].id);
+        }
+        } catch (err) {
+        setError(err.message || "Failed to load graphs.");
+        } finally {
+        setLoading(false);
+        }
     }
-  }
+    async function createTree() {
+        const name = prompt("Graph name?");
+        if (!name?.trim()) return;
 
-  async function loadTree(treeId) {
-    if (!treeId) return;
+        try {
+            setError("");
 
-    try {
-      setError("");
-      setTreeLoading(true);
+            const data = await orgGateApi.saveAdminTree({
+            name: name.trim(),
+            });
 
-      const data = await orgGateApi.getOrgNotes(treeId);
-      setTreeData(data);
-    } catch (err) {
-      setError(err.message || "Failed to load graph.");
-    } finally {
-      setTreeLoading(false);
+            const nextTree = data.tree;
+
+            setTrees((current) => [...current, nextTree]);
+            setActiveTreeId(nextTree.id);
+        } catch (err) {
+            setError(err.message || "Failed to create graph.");
+        }
     }
-  }
 
-  useEffect(() => {
-    loadWorkspace();
-  }, []);
+    async function renameTree(tree) {
+        const name = prompt("New graph name?", tree.name);
+        if (!name?.trim()) return;
 
-  useEffect(() => {
-    loadTree(activeTreeId);
-  }, [activeTreeId]);
+        try {
+            setError("");
 
-  return (
-    <>
-      <LoadingScreen visible={loading} />
+            const data = await orgGateApi.saveAdminTree({
+            id: tree.id,
+            name: name.trim(),
+            });
 
-      {!loading && (
-        <main className="notesWorkspace">
-          <NotesSidebar
-            trees={trees}
-            activeTreeId={activeTreeId}
-            error={error}
-            onSelectTree={setActiveTreeId}
-            readOnly={readOnly}
-          />
+            setTrees((current) =>
+            current.map((item) => (item.id === tree.id ? data.tree : item))
+            );
+        } catch (err) {
+            setError(err.message || "Failed to rename graph.");
+        }
+    }
 
-          <section className="notesCanvasPanel">
-            {treeLoading && <LoadingScreen visible text="Loading graph" />}
+    async function deleteTree(tree) {
+        if (!confirm(`Delete "${tree.name}"?`)) return;
 
-            {!treeLoading && treeData && (
-              <TreeCanvasBase
-                    readOnly={readOnly}
-                    treeData={treeData}
-                    loadNotes={() => Promise.resolve(treeData)}
-                    onCreateNode={(node) => orgGateApi.saveAdminNode(node)}
-                    onUpdateNode={(node) => orgGateApi.saveAdminNode(node)}
-                    onDeleteNode={(nodeId) => orgGateApi.deleteAdminNode(nodeId)}
-                />
-            )}
+        try {
+            setError("");
 
-            {!treeLoading && trees.length === 0 && (
-              <div className="notesEmptyState">
-                <p className="notesEmptyEyebrow">No graphs yet</p>
-                <h1>Start mapping your project knowledge.</h1>
-                <p>Create a graph from the admin space.</p>
-              </div>
-            )}
-          </section>
-        </main>
-      )}
-    </>
-  );
+            await orgGateApi.deleteAdminTree(tree.id);
+
+            const remainingTrees = trees.filter((item) => item.id !== tree.id);
+            setTrees(remainingTrees);
+
+            if (activeTreeId === tree.id) {
+            setActiveTreeId(remainingTrees[0]?.id || null);
+            setTreeData(null);
+            }
+        } catch (err) {
+            setError(err.message || "Failed to delete graph.");
+        }
+    }
+
+
+    async function loadTree(treeId) {
+        if (!treeId) return;
+
+        try {
+        setError("");
+        setTreeLoading(true);
+
+        const data = await orgGateApi.getOrgNotes(treeId);
+        setTreeData(data);
+        } catch (err) {
+        setError(err.message || "Failed to load graph.");
+        } finally {
+        setTreeLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        loadWorkspace();
+    }, []);
+
+    useEffect(() => {
+        loadTree(activeTreeId);
+    }, [activeTreeId]);
+
+    return (
+        <>
+        <LoadingScreen visible={loading} />
+
+        {!loading && (
+            <main className="notesWorkspace">
+            <NotesSidebar
+                trees={trees}
+                activeTreeId={activeTreeId}
+                error={error}
+                readOnly={readOnly}
+                onSelectTree={setActiveTreeId}
+                onCreateTree={!readOnly ? createTree : undefined}
+                onRenameTree={!readOnly ? renameTree : undefined}
+                onDeleteTree={!readOnly ? deleteTree : undefined}
+            />
+
+            <section className="notesCanvasPanel">
+                {treeLoading && <LoadingScreen visible text="Loading graph" />}
+
+                {!treeLoading && treeData && (
+                <TreeCanvasBase
+                        readOnly={readOnly}
+                        treeData={treeData}
+                        loadNotes={() => Promise.resolve(treeData)}
+                        onCreateNode={(node) => orgGateApi.saveAdminNode(node)}
+                        onUpdateNode={(node) => orgGateApi.saveAdminNode(node)}
+                        onDeleteNode={(nodeId) => orgGateApi.deleteAdminNode(nodeId)}
+                    />
+                )}
+
+                {!treeLoading && trees.length === 0 && (
+                <div className="notesEmptyState">
+                    <p className="notesEmptyEyebrow">No graphs yet</p>
+                    <h1>Start mapping your project knowledge.</h1>
+                    <p>Create a graph from the admin space.</p>
+                </div>
+                )}
+            </section>
+            </main>
+        )}
+        </>
+    );
 }

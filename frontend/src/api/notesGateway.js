@@ -28,4 +28,18 @@ export const notesGateway = {
       nodeId,
     });
   },
+
+  saveAdminTree(tree) {
+    return callFunction("save-admin-tree", {
+      adminToken: requireAdminToken(),
+      tree,
+    });
+  },
+
+  deleteAdminTree(treeId) {
+    return callFunction("delete-admin-tree", {
+      adminToken: requireAdminToken(),
+      treeId,
+    });
+  },
 };

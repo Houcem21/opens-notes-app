@@ -4,34 +4,79 @@ export default function NotesSidebar({
   trees,
   activeTreeId,
   error,
-  onSelectTree,
   readOnly = true,
+  onSelectTree,
+  onCreateTree,
+  onRenameTree,
+  onDeleteTree,
 }) {
   return (
     <aside className="notesSidebar">
-        <div className="notesSidebarHeader">
-            <p className="notesEyebrow">Knowledge Graphs</p>
-            <h1>Project Maps</h1>
+      <div className="notesSidebarHeader">
+        <div>
+          <p className="notesEyebrow">Knowledge Graphs</p>
+          <h1>Project Maps</h1>
+          <p className="notesSidebarMode">
+            {readOnly ? "View mode" : "Admin edit mode"}
+          </p>
         </div>
-        <p className="notesSidebarMode">
-        {readOnly ? "View mode" : "Admin edit mode"}
-        </p>
-        <ErrorMessage message={error} />
 
-        <div className="notesGraphList">
-            {trees.map((tree) => (
+        {!readOnly && (
+          <button className="btn" type="button" onClick={onCreateTree}>
+            + Graph
+          </button>
+        )}
+      </div>
+
+      <ErrorMessage message={error} />
+
+      <div className="notesGraphList">
+        {trees.length === 0 ? (
+          <p className="mutedText">No graphs yet.</p>
+        ) : (
+          trees.map((tree) => (
             <button
-                key={tree.id}
-                className={`notesGraphItem ${
+              key={tree.id}
+              className={`notesGraphItem ${
                 tree.id === activeTreeId ? "active" : ""
-                }`}
-                onClick={() => onSelectTree(tree.id)}
+              }`}
+              onClick={() => onSelectTree(tree.id)}
             >
+              <span className="notesGraphContent">
                 <strong>{tree.name}</strong>
-                <span>Graph</span>
+                <small>Graph</small>
+              </span>
+
+              {!readOnly && (
+                <span className="notesGraphActions">
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onRenameTree(tree);
+                    }}
+                  >
+                    Rename
+                  </span>
+
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className="dangerText"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDeleteTree(tree);
+                    }}
+                  >
+                    Delete
+                  </span>
+                </span>
+              )}
             </button>
-            ))}
-        </div>
+          ))
+        )}
+      </div>
     </aside>
   );
 }
