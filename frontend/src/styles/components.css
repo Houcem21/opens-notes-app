@@ -68,3 +68,30 @@
   font-size: 12px;
   font-weight: 800;
 }
+
+.authEyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.authDivider {
+  width: 100%;
+  height: 1px;
+  margin: var(--space-5) 0;
+  background: var(--color-border);
+}
+
+.authHelpText {
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.authRegisterLink {
+  width: 100%;
+  text-decoration: none;
+}
