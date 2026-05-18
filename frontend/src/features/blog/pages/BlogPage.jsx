@@ -7,7 +7,7 @@ import { orgGateApi } from "../../../api";
 import { useSession } from "../../../common/session/useSession";
 import SidebarToggleBtn from "../components/SidebarToggleBtn";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
-
+import EmptyState from "../../../common/ui/EmptyState";
 export default function BlogPage() {
 
   const [posts, setPosts] = useState([]);
@@ -81,7 +81,12 @@ export default function BlogPage() {
     <>
       <LoadingScreen visible={loading} />
 
-      {!loading && (
+      {!loading && ( posts.length === 0 ? (
+        <EmptyState
+          eyebrow="Documentation"
+          title="No posts yet"
+          description="This organization has not published documentation yet."
+        />) : (
         <div className={`blogPage ${!sidebarOpen ? "blogSidebarClosed" : ""}`}>
           <SidebarToggleBtn fn={() => setSidebarOpen((value) => !value)} open={sidebarOpen} />
           <aside className="blogList">
@@ -153,7 +158,7 @@ export default function BlogPage() {
             </article>
             )}
           </main>
-        </div>
+        </div>)
       )}
     </>
   );

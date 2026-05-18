@@ -31,7 +31,7 @@ export default function LoadingScreen({
       }`}
     >
       <div className="loadingLogoShell">
-        <img className="loadingLogo" src="../../../../public/icon-big.png" alt="" />
+        <img className="loadingLogo" src="/icon-big.png" alt="" />
       </div>
 
       <p className="loadingText">{text}</p>

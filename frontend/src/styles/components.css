@@ -95,3 +95,32 @@
   width: 100%;
   text-decoration: none;
 }
+
+.emptyState {
+  min-height: 320px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.emptyStateEyebrow {
+  margin: 0;
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.emptyStateDescription {
+  max-width: 520px;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.emptyStateAction {
+  margin-top: var(--space-3);
+}

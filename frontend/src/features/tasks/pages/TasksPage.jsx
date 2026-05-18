@@ -4,6 +4,8 @@ import TaskBoard from "../components/TaskBoard";
 import "../styles/tasks.css";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 
+import EmptyState from "../../../common/ui/EmptyState";
+
 export default function TasksPage() {
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -43,8 +45,15 @@ export default function TasksPage() {
               <h1>Current Progress</h1>
             </div>
           </header>
-
-          <TaskBoard columns={columns} tasks={tasks} />
+          {!loading && tasks.length === 0 ? (
+            <EmptyState
+                eyebrow="Task Boards"
+                title="No tasks yet"
+                description="Create your first task board from the admin workspace."
+                />
+            ) :(
+            <TaskBoard columns={columns} tasks={tasks} />
+          )}
         </main>
       )}
     </>

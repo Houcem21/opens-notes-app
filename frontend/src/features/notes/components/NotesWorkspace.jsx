@@ -4,6 +4,8 @@ import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 import NotesSidebar from "./NotesSidebar";
 import TreeCanvasBase from "./TreeCanvasBase";
 
+import EmptyState from "../../../common/ui/EmptyState";
+
 export default function NotesWorkspace({ readOnly = true }) {
     const [trees, setTrees] = useState([]);
     const [activeTreeId, setActiveTreeId] = useState(null);
@@ -148,11 +150,11 @@ export default function NotesWorkspace({ readOnly = true }) {
                 )}
 
                 {!treeLoading && trees.length === 0 && (
-                <div className="notesEmptyState">
-                    <p className="notesEmptyEyebrow">No graphs yet</p>
-                    <h1>Start mapping your project knowledge.</h1>
-                    <p>Create a graph from the admin space.</p>
-                </div>
+                <EmptyState
+                    eyebrow="Knowledge Graphs"
+                    title="No graphs yet"
+                    description="Create your first project graph from the admin workspace."
+                    />
                 )}
             </section>
             </main>
