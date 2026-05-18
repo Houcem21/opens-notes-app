@@ -4,7 +4,7 @@ import "../styles/register.css";
 
 export default function RegisterPage() {
   const [organizationName, setOrganizationName] = useState("");
-  const [email, setEmail] = useState("");
+  const [result, setResult] = useState(null);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
@@ -15,11 +15,11 @@ export default function RegisterPage() {
       setError("");
       setStatus("loading");
 
-      await orgGateApi.requestOrgRegistration({
+      const data = await orgGateApi.createOrganization({
         organizationName,
-        email,
       });
 
+      setResult(data);
       setStatus("success");
     } catch (err) {
       setStatus("idle");
@@ -27,23 +27,36 @@ export default function RegisterPage() {
     }
   }
 
+  function copy(value) {
+    navigator.clipboard.writeText(value);
+  }
+
   return (
     <main className="registerPage">
       <section className="registerCard">
         <p className="registerEyebrow">Create workspace</p>
+
         <h1>Register your organization</h1>
+
         <p className="registerIntro">
-          Enter your organization name and email. We’ll send a verification link
-          before creating your workspace.
+          Create a private workspace for your team. Save the generated codes
+          somewhere safe.
         </p>
 
-        {status === "success" ? (
+        {status === "success" && result ? (
           <div className="registerSuccess">
-            <h2>Check your email</h2>
-            <p>
-              We sent you a verification link. Open it to create your
-              organization and receive your access codes.
+            <h2>{result.organization.name} is ready</h2>
+
+            <p className="registerWarning">
+              Save these codes now. The admin code will not be shown again.
             </p>
+
+            <CodeBox label="Organization access code" value={result.accessCode} onCopy={copy} />
+            <CodeBox label="Admin code" value={result.adminCode} onCopy={copy} />
+
+            <a className="btn registerEnterLink" href="/blog">
+              Enter workspace
+            </a>
           </div>
         ) : (
           <form className="registerForm" onSubmit={submitRegistration}>
@@ -59,23 +72,28 @@ export default function RegisterPage() {
               />
             </label>
 
-            <label>
-              Email
-              <input
-                className="input"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </label>
-
-            <button className="btn" type="submit" disabled={status === "loading"}>
-              {status === "loading" ? "Sending..." : "Send verification email"}
+            <button
+              className="btn"
+              type="submit"
+              disabled={status === "loading"}
+            >
+              {status === "loading" ? "Creating..." : "Create organization"}
             </button>
           </form>
         )}
       </section>
     </main>
+  );
+}
+
+function CodeBox({ label, value, onCopy }) {
+  return (
+    <div className="registerCodeBox">
+      <span>{label}</span>
+      <code>{value}</code>
+      <button className="btn btnSecondary" type="button" onClick={() => onCopy(value)}>
+        Copy
+      </button>
+    </div>
   );
 }
