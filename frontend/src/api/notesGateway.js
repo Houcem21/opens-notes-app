@@ -42,4 +42,11 @@ export const notesGateway = {
       treeId,
     });
   },
+  
+  importGithubRepo(repoUrl) {
+    return callFunction("import-github-repo", {
+      adminToken: requireAdminToken(),
+      repoUrl,
+    });
+  },
 };

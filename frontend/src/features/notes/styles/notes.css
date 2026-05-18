@@ -232,6 +232,12 @@
   font-size: 13px;
 }
 
+.notesSidebarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 .notesGraphItem {
   display: flex;
   align-items: center;

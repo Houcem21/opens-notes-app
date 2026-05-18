@@ -1,4 +1,5 @@
 import ErrorMessage from "../../../common/components/ErrorMessage";
+import { Link } from "react-router-dom";
 
 export default function NotesSidebar({
   trees,
@@ -22,9 +23,15 @@ export default function NotesSidebar({
         </div>
 
         {!readOnly && (
-          <button className="btn" type="button" onClick={onCreateTree}>
-            + Graph
-          </button>
+          <div> 
+            <button className="btn" type="button" onClick={onCreateTree}>
+              + Graph
+            </button>
+
+            <Link className="btn btnSecondary" to="/admin/notes/import">
+              Import Repo
+            </Link>
+          </div>
         )}
       </div>
 

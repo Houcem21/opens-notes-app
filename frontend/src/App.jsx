@@ -9,6 +9,7 @@ import AdminHome from "./admin/home/pages/AdminHome"
 import NotesAdmin from "./admin/notes/pages/NotesAdmin"
 import BlogCms from "./admin/blog/pages/BlogCms"
 import TasksAdmin from "./admin/tasks/pages/TasksAdmin";
+import ImportGithubRepo from "./admin/notes/pages/ImportGithubRepo";
 
 // Feature Pages
 import Home from "./features/home/pages/Home"
@@ -65,6 +66,7 @@ export default function App() {
                 </AdminRouteGuard>
                 }>
                 <Route path="notes" element={<NotesAdmin />} />
+                <Route path="notes/import" element={<ImportGithubRepo />} />
                 <Route path="blog" element={<BlogCms />} />
                 <Route path="tasks" element={<TasksAdmin />} />
                 
