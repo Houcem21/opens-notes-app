@@ -146,36 +146,37 @@ export function useTreeNodeActions({
     [readOnly, onUpdateNode, getIntersectingNodes, setNodes]
   );
 
-  const saveNodeDetails = useCallback(
-    async ({ node, title, notes }) => {
-      if (readOnly || !node || typeof onUpdateNode !== "function") return;
+  const updateNotes = useCallback(
+    async (nodeId, notes) => {
+      if (readOnly || typeof onUpdateNode !== "function") return;
+
+      const currentNode = nodesRef.current.find((node) => node.id === nodeId);
 
       const saved = await onUpdateNode({
-        id: node.id,
-        title,
+        id: nodeId,
+        title: currentNode?.data?.title || "Untitled",
         notes,
-        parentId: node.data?.parentId ?? null,
-        pos: node.position || { x: 0, y: 0 },
+        parentId: currentNode?.data?.parentId ?? null,
+        pos: currentNode?.position || { x: 0, y: 0 },
       });
 
       const savedNode = saved.node || saved;
 
       setNodes((current) =>
-        current.map((item) =>
-          item.id === node.id
+        current.map((node) =>
+          node.id === nodeId
             ? {
-                ...item,
+                ...node,
                 data: {
-                  ...item.data,
-                  title: savedNode.title || title,
+                  ...node.data,
                   notes: savedNode.notes || notes,
                 },
               }
-            : item
+            : node
         )
       );
     },
-    [readOnly, onUpdateNode, setNodes]
+    [readOnly, onUpdateNode, nodesRef, setNodes]
   );
 
   return {
@@ -183,6 +184,6 @@ export function useTreeNodeActions({
     deleteNode,
     renameNode,
     moveNode,
-    saveNodeDetails,
+    updateNotes,
   };
 }

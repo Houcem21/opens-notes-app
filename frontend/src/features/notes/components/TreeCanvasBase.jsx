@@ -12,7 +12,6 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 
 import CanvasSidebar from "./CanvasSidebar";
-import NodeEditorModal from "./NodeEditorModal";
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 import { useTreeNodeActions } from "../hooks/useTreeNodeActions";
 import "../styles/notes.css";
@@ -48,26 +47,19 @@ function TreeCanvasBaseInner({
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [activeNodeId, setActiveNodeId] = useState(null);
-
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const nodesRef = useRef([]);
   const { getIntersectingNodes } = useReactFlow();
 
-  const activeNode = useMemo(
-    () => nodes.find((node) => node.id === activeNodeId) || null,
-    [nodes, activeNodeId]
-  );
 
   const {
     addChild,
     deleteNode,
     renameNode,
     moveNode,
-    saveNodeDetails,
+    updateNotes,
   } = useTreeNodeActions({
     readOnly,
     tree,
@@ -127,32 +119,10 @@ function TreeCanvasBaseInner({
         onAddChild: addChild,
         onDelete: deleteNode,
         onRename: renameNode,
+        onUpdateNotes: updateNotes,
       },
     }));
   }, [nodes, readOnly, addChild, deleteNode, renameNode]);
-
-  const openNodeEditor = useCallback(
-    (event, node) => {
-      if (readOnly) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      setActiveNodeId(node.id);
-      setEditorOpen(true);
-    },
-    [readOnly]
-  );
-
-  async function handleSaveNodeDetails({ title, notes }) {
-    await saveNodeDetails({
-      node: activeNode,
-      title,
-      notes,
-    });
-
-    setEditorOpen(false);
-  }
 
 
 
@@ -169,7 +139,6 @@ function TreeCanvasBaseInner({
                 nodeTypes={NODE_TYPES}
                 edgeTypes={EDGE_TYPES}
                 fitView
-                onNodeDoubleClick={readOnly ? undefined : openNodeEditor}
                 onNodeDragStop={readOnly ? undefined : moveNode}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
@@ -180,15 +149,6 @@ function TreeCanvasBaseInner({
               </ReactFlow>
             </div>
           </div>
-
-          {!readOnly && (
-            <NodeEditorModal
-              open={editorOpen}
-              node={activeNode}
-              onClose={() => setEditorOpen(false)}
-              onSave={handleSaveNodeDetails}
-            />
-          )}
         </div>
       )}
     </>

@@ -1,98 +1,139 @@
-// frontend/src/components/BlockNode.jsx
-import React, { useMemo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Handle, Position } from "reactflow";
 
-export default function BlockNode({ id, data, selected }) {
-  const { title, isRoot, onAddChild, onDelete, onRename } = data;
+function BlockNode({ id, data, selected }) {
+  const {
+    title,
+    notes,
+    isRoot,
+    readOnly,
+    onAddChild,
+    onDelete,
+    onRename,
+    onUpdateNotes,
+  } = data;
 
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(title || "");
-  const canEdit = !data.readOnly;
-  // Keep input synced when node updates externally
-  useMemo(() => {
-    setValue(title || "");
-  }, [title]);
+  const canEdit = !readOnly;
 
-  function commit() {
-    const next = value.trim();
-    setEditing(false);
+  const [localTitle, setLocalTitle] = useState(title || "");
+  const [localNotes, setLocalNotes] = useState(notes || "");
 
-    if (!next) {
-      setValue(title || "");
+  useEffect(() => {
+    setLocalTitle(title || "");
+    setLocalNotes(notes || "");
+  }, [title, notes]);
+
+  function saveTitle() {
+    const nextTitle = localTitle.trim();
+
+    if (!nextTitle) {
+      setLocalTitle(title || "");
       return;
     }
 
-    if (!data.readOnly && next !== title && typeof onRename === "function") {
-      onRename(id, next);
+    if (nextTitle !== title) {
+      onRename?.(id, nextTitle);
+    }
+  }
+
+  function saveNotes() {
+    if ((localNotes || "") !== (notes || "")) {
+      onUpdateNotes?.(id, localNotes);
     }
   }
 
   return (
-    <div className={`blockNode ${selected ? "selected" : ""}`}>
-      {/* Optional handles (not used for edges right now, but safe) */}
-      <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-      <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-      {!data.readOnly && (
-        <div className="blockHeader">
-          {typeof onAddChild === "function" && (
+    <div
+      className={`blockNode ${selected ? "selected" : ""} ${
+        isRoot ? "root" : ""
+      }`}
+    >
+      <Handle type="target" position={Position.Top} className="nodeHandle" />
+
+      <div className="blockNodeTop">
+        <span className="blockNodeType">{isRoot ? "Root" : "Node"}</span>
+
+        {canEdit && (
+          <div className="blockNodeActions">
             <button
-              className="iconBtn"
+              className="blockNodeAction"
+              type="button"
               title="Add child"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddChild(id);
+              onClick={(event) => {
+                event.stopPropagation();
+                onAddChild?.(id);
               }}
             >
               +
             </button>
-          )}
 
-          {!isRoot && typeof onDelete === "function" && (
-            <button
-              className="iconBtn danger"
-              title="Delete"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(id);
+            {!isRoot && (
+              <button
+                className="blockNodeAction danger"
+                type="button"
+                title="Delete node"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onDelete?.(id);
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="blockNodeBody">
+        {canEdit ? (
+          <>
+            <input
+              className="blockNodeTitleInput"
+              value={localTitle}
+              placeholder="Untitled"
+              onChange={(event) => setLocalTitle(event.target.value)}
+              onBlur={saveTitle}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.currentTarget.blur();
+                }
               }}
-            >
-              ×
-            </button>
-          )}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+            />
+
+            <textarea
+              className="blockNodeNotesInput"
+              value={localNotes}
+              placeholder="Add notes..."
+              onChange={(event) => setLocalNotes(event.target.value)}
+              onBlur={saveNotes}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+            />
+          </>
+        ) : (
+          <>
+            <h3>{title || "Untitled"}</h3>
+
+            {notes?.trim() ? (
+              <p>{notes}</p>
+            ) : (
+              <p className="blockNodeMuted">No details yet.</p>
+            )}
+          </>
+        )}
+      </div>
+
+      {canEdit && (
+        <div className="blockNodeFooter">
+          <span>Drag empty areas to organize</span>
         </div>
       )}
 
-      <div className="blockBody">
-        {!editing ? (
-          <div
-            className="blockTitle"
-            onDoubleClick={(e) => {
-              e.stopPropagation();
-              if (!canEdit) return;
-            }}
-            onClick={(e) => e.stopPropagation()}
-            title={data.readOnly ? "Read" : "Double click to rename"}
-          >
-            {title || "Untitled"}
-          </div>
-        ) : (
-          <input
-            className="blockInput"
-            autoFocus
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onBlur={commit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
-              if (e.key === "Escape") {
-                setEditing(false);
-                setValue(title || "");
-              }
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        )}
-      </div>
+      <Handle type="source" position={Position.Bottom} className="nodeHandle" />
     </div>
   );
 }
+
+export default memo(BlockNode);

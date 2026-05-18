@@ -1,4 +1,4 @@
-import { Home, BookOpen, Network, CheckSquare, Hammer, BookOpenText, ChartNetwork, ListTodo } from "lucide-react";
+import { Home, BookOpen, Network, CheckSquare, Pencil, BookOpenText, ChartNetwork, ListTodo } from "lucide-react";
 
 const NavIcon = ({iconTitle, isActive}) => {
     
@@ -8,7 +8,7 @@ const NavIcon = ({iconTitle, isActive}) => {
         case "Blog": return <BookOpen className={isActive ? "icon active" : "icon"} />;
         case "Notes": return <Network className={isActive ? "icon active" : "icon"} />;
         case "Tasks": return <CheckSquare className={isActive ? "icon active" : "icon"} />;
-        case "Admin": return <Hammer className={isActive ? "icon active" : "icon"} />;
+        case "Admin": return <Pencil className={isActive ? "icon active" : "icon"} />;
         case "Admin Blog": return <BookOpenText className={isActive ? "icon active" : "icon"} />;
         case "Admin Notes": return <ChartNetwork className={isActive ? "icon active" : "icon"} />;
         case "Admin Tasks": return <ListTodo className={isActive ? "icon active" : "icon"} />;
