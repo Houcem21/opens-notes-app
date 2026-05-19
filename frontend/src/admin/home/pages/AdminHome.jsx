@@ -1,10 +1,10 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
+import {useSession} from "../../../common/session/useSession";
 
-import { orgGateApi } from "../../../api";
 export default function AdminHome() {
   const location = useLocation();
   const isAdminIndex = location.pathname === "/admin";
-
+  const { clearAdmin } = useSession();
 
   if (!isAdminIndex) {
     return (
@@ -38,7 +38,7 @@ export default function AdminHome() {
 
       <button
         className="btn btnSecondary logoutBtn"
-        onClick={() => orgGateApi.logoutAdmin()}
+        onClick={clearAdmin}
       >
         Logout
       </button>

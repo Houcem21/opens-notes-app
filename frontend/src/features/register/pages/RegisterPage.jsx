@@ -31,6 +31,26 @@ export default function RegisterPage() {
     navigator.clipboard.writeText(value);
   }
 
+  function downloadCodes() {
+    const content = [
+      `Organization: ${result.organization.name}`,
+      `Access code: ${result.accessCode}`,
+      `Admin code: ${result.adminCode}`,
+      "",
+      "Save these codes securely. The admin code gives editing access.",
+    ].join("\n");
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${result.organization.slug}-access-codes.txt`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <main className="registerPage">
       <section className="registerCard">
@@ -53,7 +73,9 @@ export default function RegisterPage() {
 
             <CodeBox label="Organization access code" value={result.accessCode} onCopy={copy} />
             <CodeBox label="Admin code" value={result.adminCode} onCopy={copy} />
-
+            <button className="btn btnSecondary" type="button" onClick={downloadCodes}>
+              Save codes as file
+            </button>
             <a className="btn registerEnterLink" href="/blog">
               Enter workspace
             </a>
