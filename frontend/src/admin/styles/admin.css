@@ -147,12 +147,6 @@
   right: 18px;
 }
 
-.postQueue {
-  border-right: 1px solid var(--color-border-light);
-  display: flex;
-  flex-direction: column;
-}
-
 .postQueueHeader {
   display: flex;
   align-items: center;
@@ -188,7 +182,7 @@
   gap: 4px;
   padding: 11px;
   margin-bottom: 10px;
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg-dark);
   color: var(--color-text);
@@ -259,7 +253,7 @@
 
 .pageDocument {
   margin-top: 22px;
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 22px;
 }
@@ -267,7 +261,7 @@
 .pageTitleInput {
   width: 100%;
   border: none;
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 12px;
   margin-bottom: 16px;
   font-size: 26px;
@@ -278,7 +272,7 @@
 }
 
 .editorSettings {
-  border-left: 1px solid var(--color-border-light);
+  border-left: 1px solid var(--color-border);
   padding: 18px;
 }
 

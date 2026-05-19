@@ -11,10 +11,8 @@ import ReactFlow, {
 
 import "reactflow/dist/style.css";
 
-import CanvasSidebar from "./CanvasSidebar";
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 import { useTreeNodeActions } from "../hooks/useTreeNodeActions";
-import "../styles/notes.css";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 
 export default function TreeCanvasBase({

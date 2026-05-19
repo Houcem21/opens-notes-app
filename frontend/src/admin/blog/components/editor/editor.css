@@ -22,8 +22,9 @@
 
 .richToolbar button {
   padding: 7px 10px;
-  border: 1px solid var(--color-border-light);
-  background: white;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-grey);
+  color: var(--color-text);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }

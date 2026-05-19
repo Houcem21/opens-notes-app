@@ -4,7 +4,7 @@ import ErrorMessage from "../../../common/components/ErrorMessage";
 import { useSession } from "../../../common/session/useSession";
 import { orgGateApi } from "../../../api";
 
-import TaskBoard from "../../../features/tasks/components/TaskBoard";
+import TaskBoard from "../../../common/tasks/components/TaskBoard";
 import AdminTaskHeader from "./AdminTaskHeader";
 import AdminTaskCreateForm from "./AdminTaskCreateForm";
 
@@ -13,7 +13,7 @@ import {
   createNewTaskPayload,
 } from "../utils/taskDrafts";
 
-import "../../../features/tasks/styles/tasks.css";
+import "../../../common/tasks/styles/tasks.css";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 
 

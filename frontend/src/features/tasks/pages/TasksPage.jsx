@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { orgGateApi } from "../../../api";
-import TaskBoard from "../components/TaskBoard";
-import "../styles/tasks.css";
+import TaskBoard from "../../../common/tasks/components/TaskBoard";
+import "../../../common/tasks/styles/tasks.css";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 
 import EmptyState from "../../../common/ui/EmptyState";

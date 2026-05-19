@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { orgGateApi } from "../../../api";
-import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+import LoadingScreen from "../../components/loading/LoadingScreen";
 import NotesSidebar from "./NotesSidebar";
 import TreeCanvasBase from "./TreeCanvasBase";
 
-import EmptyState from "../../../common/ui/EmptyState";
+import EmptyState from "../../ui/EmptyState";
 
 export default function NotesWorkspace({ readOnly = true }) {
     const [trees, setTrees] = useState([]);

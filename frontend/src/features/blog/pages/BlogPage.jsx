@@ -5,7 +5,7 @@ import "../styles/blog.css";
 
 import { orgGateApi } from "../../../api";
 import { useSession } from "../../../common/session/useSession";
-import SidebarToggleBtn from "../components/SidebarToggleBtn";
+import SidebarToggleBtn from "../../../common/ui/SidebarToggleBtn";
 import LoadingScreen from "../../../common/components/loading/LoadingScreen";
 import EmptyState from "../../../common/ui/EmptyState";
 export default function BlogPage() {
