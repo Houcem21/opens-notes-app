@@ -1,3 +1,5 @@
+import { callFunction } from "./edgeClient";
+
 const ORG_TOKEN_KEY = "orgToken";
 const ACTIVE_ORG_KEY = "activeOrg";
 const ADMIN_TOKEN_KEY = "adminToken";
@@ -23,6 +25,12 @@ export const orgSessionApi = {
     localStorage.removeItem(ADMIN_TOKEN_KEY);
   },
 
+  async enterOrg(code) {
+    const data = await callFunction("enter-org", { code });
+    this.saveOrgSession(data);
+    return data;
+  },
+
   getAdminToken() {
     return localStorage.getItem(ADMIN_TOKEN_KEY);
   },
@@ -33,5 +41,21 @@ export const orgSessionApi = {
 
   clearAdminSession() {
     localStorage.removeItem(ADMIN_TOKEN_KEY);
+  },
+
+  async enterAdmin(adminCode) {
+    const orgToken = this.getOrgToken();
+
+    if (!orgToken) {
+      throw new Error("Organization access required.");
+    }
+
+    const data = await callFunction("enter-admin", {
+      orgToken,
+      adminCode,
+    });
+
+    this.saveAdminSession(data);
+    return data;
   },
 };
