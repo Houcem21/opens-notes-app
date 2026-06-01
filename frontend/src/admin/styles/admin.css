@@ -200,13 +200,13 @@
 }
 
 .documentTitle {
+  color: var(--color-text);
   width: 100%;
   border: none;
   background: transparent;
   font-size: 42px;
   font-weight: 800;
   outline: none;
-  color: var(--color-text-dark);
   padding-top: 32px;
 }
 
@@ -423,10 +423,6 @@
     padding: 20px;
   }
 
-  .documentTitle {
-    font-size: 34px;
-    padding-top: 16px;
-  }
 
   .pageBar {
     align-items: flex-start;

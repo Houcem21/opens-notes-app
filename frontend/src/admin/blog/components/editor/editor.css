@@ -53,6 +53,16 @@
   color: white;
 }
 
+.richEditorContent a {
+  color: white;
+  cursor: pointer;
+  transition: color .1s ease-in-out;
+}
+
+.richEditorContent a:hover {
+  color: var(--color-bg-grey);
+}
+
 .richEditorContent pre {
   padding: var(--space-md);
   border-radius: var(--radius-md);
