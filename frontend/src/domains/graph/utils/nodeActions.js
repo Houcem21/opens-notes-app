@@ -5,8 +5,9 @@ export function getSavedNode(result) {
 export function createNodeUpdatePayload(node, overrides = {}) {
   return {
     id: node.id,
+    treeId: node.data?.treeId,
     title: node.data?.title || "Untitled",
-    notes: node.data?.notes || "",
+    details: node.data?.details || node.data?.notes || "",
     parentId: node.data?.parentId ?? null,
     pos: node.position || { x: 0, y: 0 },
     ...overrides,

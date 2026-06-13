@@ -6,7 +6,7 @@ function stopNodeEvent(event) {
   event.stopPropagation();
 }
 
-function BlockNode({ id, data, selected }) {
+function BubbleNode({ id, data, selected }) {
   const {
     title,
     notes,
@@ -129,4 +129,4 @@ function BlockNode({ id, data, selected }) {
   );
 }
 
-export default memo(BlockNode);
+export default memo(BubbleNode);

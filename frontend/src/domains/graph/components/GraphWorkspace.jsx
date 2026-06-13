@@ -2,7 +2,7 @@ import { orgGateApi } from "../../../api";
 import LoadingScreen from "../../../common/feedback/LoadingScreen";
 import EmptyState from "../../../common/ui/EmptyState";
 import GraphSidebar from "./GraphSidebar";
-import TreeCanvasBase from "./TreeCanvasBase";
+import GraphCanvasBase from "./GraphCanvasBase";
 import { useGraphWorkspace } from "../hooks/useGraphWorkspace";
 
 export default function GraphWorkspace({ readOnly = true }) {
@@ -40,7 +40,7 @@ export default function GraphWorkspace({ readOnly = true }) {
             {treeLoading && <LoadingScreen visible text="Loading graph" />}
 
             {!treeLoading && treeData && (
-              <TreeCanvasBase
+              <GraphCanvasBase
                 readOnly={readOnly}
                 treeData={treeData}
                 loadNotes={() => Promise.resolve(treeData)}

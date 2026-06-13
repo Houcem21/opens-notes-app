@@ -28,9 +28,10 @@ export function useTreeNodeActions({
       };
 
       const saved = await onCreateNode({
+        treeId: tree?.id,
         parentId,
         title: "New",
-        notes: "",
+        details: "",
         pos: position,
       });
 

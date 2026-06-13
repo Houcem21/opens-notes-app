@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import ErrorMessage from "../../../common/feedback/ErrorMessage";
 
-export default function NotesSidebar({
+export default function GraphSidebar({
   trees,
   activeTreeId,
   error,

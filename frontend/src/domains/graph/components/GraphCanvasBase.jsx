@@ -14,7 +14,7 @@ import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
 import { useTreeCanvasData } from "../hooks/useTreeCanvasData";
 import { useTreeNodeActions } from "../hooks/useTreeNodeActions";
 
-export default function TreeCanvasBase({
+export default function GraphCanvasBase({
   loadNotes,
   readOnly = true,
   onCreateNode,

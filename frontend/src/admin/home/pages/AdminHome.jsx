@@ -25,8 +25,8 @@ export default function AdminHome() {
           <span>Manage documentation posts.</span>
         </Link>
 
-        <Link className="adminLandingCard" to="/admin/notes">
-          <strong>Notes Admin</strong>
+        <Link className="adminLandingCard" to="/admin/graph">
+          <strong>Graph Admin</strong>
           <span>Edit organization knowledge trees.</span>
         </Link>
 

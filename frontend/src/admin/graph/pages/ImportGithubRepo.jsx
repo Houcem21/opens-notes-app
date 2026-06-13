@@ -25,7 +25,7 @@ export default function ImportGithubRepo() {
       setStatus("success");
 
       setTimeout(() => {
-        navigate("/admin/notes");
+        navigate("/admin/graph");
       }, 900);
     } catch (err) {
       setStatus("idle");
@@ -80,7 +80,7 @@ export default function ImportGithubRepo() {
               <button
                 className="btn btnSecondary"
                 type="button"
-                onClick={() => navigate("/admin/notes")}
+                onClick={() => navigate("/admin/graph")}
               >
                 Cancel
               </button>
