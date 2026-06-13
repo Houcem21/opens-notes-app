@@ -3,17 +3,17 @@ import { useEffect, useState } from "react";
 export function useInlineNodeEdit({
   id,
   title,
-  notes,
+  details,
   onRename,
-  onUpdateNotes,
+  onUpdateDetails,
 }) {
   const [localTitle, setLocalTitle] = useState(title || "");
-  const [localNotes, setLocalNotes] = useState(notes || "");
+  const [localDetails, setLocalDetails] = useState(details || "");
 
   useEffect(() => {
     setLocalTitle(title || "");
-    setLocalNotes(notes || "");
-  }, [title, notes]);
+    setLocalDetails(details || "");
+  }, [title, details]);
 
   function saveTitle() {
     const nextTitle = localTitle.trim();
@@ -28,18 +28,18 @@ export function useInlineNodeEdit({
     }
   }
 
-  function saveNotes() {
-    if ((localNotes || "") !== (notes || "")) {
-      onUpdateNotes?.(id, localNotes);
+  function saveDetails() {
+    if ((localDetails || "") !== (details || "")) {
+      onUpdateDetails?.(id, localDetails);
     }
   }
 
   return {
     localTitle,
-    localNotes,
+    localDetails,
     setLocalTitle,
-    setLocalNotes,
+    setLocalDetails,
     saveTitle,
-    saveNotes,
+    saveDetails,
   };
 }

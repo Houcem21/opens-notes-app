@@ -7,7 +7,7 @@ export function createNodeUpdatePayload(node, overrides = {}) {
     id: node.id,
     treeId: node.data?.treeId,
     title: node.data?.title || "Untitled",
-    details: node.data?.details || node.data?.notes || "",
+    details: node.data?.details || "",
     parentId: node.data?.parentId ?? null,
     pos: node.position || { x: 0, y: 0 },
     ...overrides,
@@ -28,7 +28,7 @@ export function createChildFlowNode({
     position,
     data: {
       title: savedNode.title || "New",
-      notes: savedNode.notes || "",
+      details: savedNode.details || savedNode.notes || "",
       isRoot: false,
       treeId,
       parentId,

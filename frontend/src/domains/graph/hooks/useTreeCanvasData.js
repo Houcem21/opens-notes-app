@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useEdgesState, useNodesState } from "reactflow";
 import { toFlowEdges, toFlowNodes } from "../utils/treeFlowMapping";
 
-export function useTreeCanvasData({ loadNotes, readOnly }) {
+export function useTreeCanvasData({ loadGraph, readOnly }) {
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,7 @@ export function useTreeCanvasData({ loadNotes, readOnly }) {
       setLoading(true);
 
       try {
-        const data = await loadNotes();
+        const data = await loadGraph();
         const nextTree = data.tree || { id: null, name: "Learning" };
         const nextNodes = data.nodes || [];
 
@@ -36,7 +36,7 @@ export function useTreeCanvasData({ loadNotes, readOnly }) {
     }
 
     refreshTree();
-  }, [loadNotes, readOnly, setNodes]);
+  }, [loadGraph, readOnly, setNodes]);
 
   return {
     tree,

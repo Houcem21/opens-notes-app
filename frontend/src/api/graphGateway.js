@@ -8,8 +8,8 @@ export const graphGateway = {
     });
   },
 
-  getOrgNotes(treeId = null) {
-    return callFunction("get-org-notes", {
+  getOrgGraph(treeId = null) {
+    return callFunction("get-org-graph", {
       orgToken: requireOrgToken(),
       treeId,
     });

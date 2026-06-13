@@ -43,7 +43,7 @@ export default function GraphWorkspace({ readOnly = true }) {
               <GraphCanvasBase
                 readOnly={readOnly}
                 treeData={treeData}
-                loadNotes={() => Promise.resolve(treeData)}
+                loadGraph={() => Promise.resolve(treeData)}
                 onCreateNode={(node) => orgGateApi.saveAdminNode(node)}
                 onUpdateNode={(node) => orgGateApi.saveAdminNode(node)}
                 onDeleteNode={(nodeId) => orgGateApi.deleteAdminNode(nodeId)}

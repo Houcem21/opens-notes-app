@@ -15,7 +15,7 @@ import { useTreeCanvasData } from "../hooks/useTreeCanvasData";
 import { useTreeNodeActions } from "../hooks/useTreeNodeActions";
 
 export default function GraphCanvasBase({
-  loadNotes,
+  loadGraph,
   readOnly = true,
   onCreateNode,
   onUpdateNode,
@@ -24,7 +24,7 @@ export default function GraphCanvasBase({
   return (
     <ReactFlowProvider>
       <TreeCanvasBaseInner
-        loadNotes={loadNotes}
+        loadGraph={loadGraph}
         readOnly={readOnly}
         onCreateNode={onCreateNode}
         onUpdateNode={onUpdateNode}
@@ -35,7 +35,7 @@ export default function GraphCanvasBase({
 }
 
 function TreeCanvasBaseInner({
-  loadNotes,
+  loadGraph,
   readOnly,
   onCreateNode,
   onUpdateNode,
@@ -53,9 +53,9 @@ function TreeCanvasBaseInner({
     nodesRef,
     onNodesChange,
     onEdgesChange,
-  } = useTreeCanvasData({ loadNotes, readOnly });
+  } = useTreeCanvasData({ loadGraph, readOnly });
 
-  const { addChild, deleteNode, renameNode, moveNode, updateNotes } =
+  const { addChild, deleteNode, renameNode, moveNode, updateDetails } =
     useTreeNodeActions({
       readOnly,
       tree,
@@ -78,10 +78,10 @@ function TreeCanvasBaseInner({
         onAddChild: addChild,
         onDelete: deleteNode,
         onRename: renameNode,
-        onUpdateNotes: updateNotes,
+        onUpdateDetails: updateDetails,
       },
     }));
-  }, [nodes, readOnly, addChild, deleteNode, renameNode, updateNotes]);
+  }, [nodes, readOnly, addChild, deleteNode, renameNode, updateDetails]);
 
   return (
     <>

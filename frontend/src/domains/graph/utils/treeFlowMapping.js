@@ -11,7 +11,7 @@ export function toFlowNodes(apiNodes, treeId, readOnly) {
     },
     data: {
       title: node.title,
-      notes: node.notes || "",
+      details: node.details || node.notes || "",
       isRoot: node.id === rootId,
       treeId,
       parentId: node.parent_id,

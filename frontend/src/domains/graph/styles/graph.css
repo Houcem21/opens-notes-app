@@ -159,7 +159,7 @@
 }
 
 .blockNodeTitleInput,
-.blockNodeNotesInput {
+.blockNodeDetailsInput {
   width: 100%;
   border: 0;
   outline: none;
@@ -175,7 +175,7 @@
   line-height: 1.25;
 }
 
-.blockNodeNotesInput {
+.blockNodeDetailsInput {
   min-height: 58px;
   resize: none;
   color: var(--color-muted);
@@ -184,7 +184,7 @@
 }
 
 .blockNodeTitleInput:focus,
-.blockNodeNotesInput:focus {
+.blockNodeDetailsInput:focus {
   color: var(--color-text);
 }
 
@@ -263,7 +263,7 @@
   padding: 6px 10px;
 }
 
-.nodeModalNotes {
+.nodeModalDetails {
   flex: 1;
   width: 100%;
   resize: none;
@@ -366,8 +366,8 @@
     transform var(--transition-fast);
 }
 
-.graphItem:hover .notesGraphActions,
-.graphItem.active .notesGraphActions {
+.graphItem:hover .graphActions,
+.graphItem.active .graphActions {
   opacity: 1;
   transform: translateX(0);
 }
@@ -387,8 +387,8 @@
 }
 
 
-.notesEyebrow,
-.notesEmptyEyebrow {
+.graphEyebrow,
+.graphEmptyEyebrow {
   margin: 0 0 var(--space-2);
   color: var(--color-gold);
   font-size: 12px;

@@ -9,30 +9,30 @@ function stopNodeEvent(event) {
 function BubbleNode({ id, data, selected }) {
   const {
     title,
-    notes,
+    details,
     isRoot,
     readOnly,
     onAddChild,
     onDelete,
     onRename,
-    onUpdateNotes,
+    onUpdateDetails,
   } = data;
 
   const canEdit = !readOnly;
 
   const {
     localTitle,
-    localNotes,
+    localDetails,
     setLocalTitle,
-    setLocalNotes,
+    setLocalDetails,
     saveTitle,
-    saveNotes,
+    saveDetails,
   } = useInlineNodeEdit({
     id,
     title,
-    notes,
+    details,
     onRename,
-    onUpdateNotes,
+    onUpdateDetails,
   });
 
   return (
@@ -96,11 +96,11 @@ function BubbleNode({ id, data, selected }) {
             />
 
             <textarea
-              className="blockNodeNotesInput"
-              value={localNotes}
-              placeholder="Add notes..."
-              onChange={(event) => setLocalNotes(event.target.value)}
-              onBlur={saveNotes}
+              className="blockNodeDetailsInput"
+              value={localDetails}
+              placeholder="Add details..."
+              onChange={(event) => setLocalDetails(event.target.value)}
+              onBlur={saveDetails}
               onPointerDown={stopNodeEvent}
               onClick={stopNodeEvent}
             />
@@ -109,8 +109,8 @@ function BubbleNode({ id, data, selected }) {
           <>
             <h3>{title || "Untitled"}</h3>
 
-            {notes?.trim() ? (
-              <p>{notes}</p>
+            {details?.trim() ? (
+              <p>{details}</p>
             ) : (
               <p className="blockNodeMuted">No details yet.</p>
             )}

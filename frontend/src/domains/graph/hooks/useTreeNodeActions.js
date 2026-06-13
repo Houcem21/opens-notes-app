@@ -118,7 +118,7 @@ export function useTreeNodeActions({
           data: {
             ...node.data,
             title: savedNode.title || node.data.title,
-            notes: savedNode.notes || node.data.notes,
+            details: savedNode.details || node.data.details,
             parentId,
           },
         }))
@@ -127,15 +127,15 @@ export function useTreeNodeActions({
     [readOnly, onUpdateNode, getIntersectingNodes, setNodes]
   );
 
-  const updateNotes = useCallback(
-    async (nodeId, notes) => {
+  const updateDetails = useCallback(
+    async (nodeId, details) => {
       if (readOnly || typeof onUpdateNode !== "function") return;
 
       const currentNode = nodesRef.current.find((node) => node.id === nodeId);
       if (!currentNode) return;
 
       const saved = await onUpdateNode(
-        createNodeUpdatePayload(currentNode, { notes })
+        createNodeUpdatePayload(currentNode, { details })
       );
 
       const savedNode = getSavedNode(saved);
@@ -145,7 +145,7 @@ export function useTreeNodeActions({
           ...node,
           data: {
             ...node.data,
-            notes: savedNode.notes || notes,
+            details: savedNode.details || details,
           },
         }))
       );
@@ -158,6 +158,6 @@ export function useTreeNodeActions({
     deleteNode,
     renameNode,
     moveNode,
-    updateNotes,
+    updateDetails,
   };
 }

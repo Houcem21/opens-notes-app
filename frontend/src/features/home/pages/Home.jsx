@@ -22,7 +22,7 @@ export default function Home() {
           <p>Onboarding for new Devs; Introducing the workflow.</p>
         </Link>
 
-        <Link className="homeCard" to="/notes">
+        <Link className="homeCard" to="/graph">
           <span>02</span>
           <h2>Graphs</h2>
           <p>Visual of the project's structure and its components.</p>

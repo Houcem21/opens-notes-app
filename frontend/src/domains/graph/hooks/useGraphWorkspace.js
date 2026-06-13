@@ -36,7 +36,7 @@ export function useGraphWorkspace() {
       setError("");
       setTreeLoading(true);
 
-      const data = await orgGateApi.getOrgNotes(treeId);
+      const data = await orgGateApi.getOrgGraph(treeId);
       setTreeData(data);
     } catch (err) {
       setError(err.message || "Failed to load graph.");

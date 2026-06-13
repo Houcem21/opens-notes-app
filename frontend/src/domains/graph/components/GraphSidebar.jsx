@@ -33,7 +33,7 @@ function SidebarHeader({ readOnly, onCreateTree }) {
   return (
     <div className="graphSidebarHeader">
       <div>
-        <p className="notesEyebrow">Knowledge Graphs</p>
+        <p className="GraphEyebrow">Knowledge Graphs</p>
         <h1>Project Maps</h1>
         <p className="graphSidebarMode">
           {readOnly ? "View mode" : "Admin edit mode"}
