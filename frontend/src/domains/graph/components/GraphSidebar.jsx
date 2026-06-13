@@ -12,7 +12,7 @@ export default function NotesSidebar({
   onDeleteTree,
 }) {
   return (
-    <aside className="notesSidebar">
+    <aside className="graphSidebar">
       <SidebarHeader readOnly={readOnly} onCreateTree={onCreateTree} />
 
       <ErrorMessage message={error} />
@@ -31,22 +31,22 @@ export default function NotesSidebar({
 
 function SidebarHeader({ readOnly, onCreateTree }) {
   return (
-    <div className="notesSidebarHeader">
+    <div className="graphSidebarHeader">
       <div>
         <p className="notesEyebrow">Knowledge Graphs</p>
         <h1>Project Maps</h1>
-        <p className="notesSidebarMode">
+        <p className="graphSidebarMode">
           {readOnly ? "View mode" : "Admin edit mode"}
         </p>
       </div>
 
       {!readOnly && (
-        <div className="notesSidebarActions">
+        <div className="graphSidebarActions">
           <button className="btn" type="button" onClick={onCreateTree}>
             + Graph
           </button>
 
-          <Link className="btn btnSecondary" to="/admin/notes/import">
+          <Link className="btn btnSecondary" to="/admin/graph/import">
             Import Repo
           </Link>
         </div>
@@ -65,14 +65,14 @@ function GraphList({
 }) {
   if (trees.length === 0) {
     return (
-      <div className="notesGraphList">
+      <div className="graphList">
         <p className="mutedText">No graphs yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="notesGraphList">
+    <div className="graphList">
       {trees.map((tree) => (
         <GraphListItem
           key={tree.id}
@@ -98,16 +98,16 @@ function GraphListItem({
 }) {
   return (
     <button
-      className={`notesGraphItem ${active ? "active" : ""}`}
+      className={`graphItem ${active ? "active" : ""}`}
       onClick={() => onSelectTree(tree.id)}
     >
-      <span className="notesGraphContent">
+      <span className="graphContent">
         <strong>{tree.name}</strong>
         <small>Graph</small>
       </span>
 
       {!readOnly && (
-        <span className="notesGraphActions">
+        <span className="graphActions">
           <GraphAction onClick={() => onRenameTree(tree)}>Rename</GraphAction>
 
           <GraphAction danger onClick={() => onDeleteTree(tree)}>

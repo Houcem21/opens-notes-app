@@ -296,7 +296,7 @@
   border-color: black;
 }
 
-.notesWorkspace {
+.graphWorkspace {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
@@ -306,14 +306,14 @@
   color: var(--color-text);
 }
 
-.notesSidebar {
+.graphSidebar {
   padding: var(--space-8);
   border-right: 1px solid var(--color-border);
   background: rgba(255, 255, 255, 0.035);
   backdrop-filter: blur(16px);
 }
 
-.notesSidebarHeader {
+.graphSidebarHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -321,42 +321,42 @@
   margin-bottom: var(--space-8);
 }
 
-.notesSidebarMode {
+.graphSidebarMode {
   margin-top: var(--space-3);
   color: var(--color-muted);
   font-size: 13px;
 }
 
-.notesSidebarActions {
+.graphSidebarActions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.notesGraphItem {
+.graphItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 }
 
-.notesGraphContent {
+.graphContent {
   display: grid;
   gap: var(--space-1);
   min-width: 0;
 }
 
-.notesGraphContent strong {
+.graphContent strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.notesGraphContent small {
+.graphContent small {
   color: var(--color-muted);
 }
 
-.notesGraphActions {
+.graphActions {
   display: flex;
   gap: var(--space-2);
   opacity: 0;
@@ -366,19 +366,19 @@
     transform var(--transition-fast);
 }
 
-.notesGraphItem:hover .notesGraphActions,
-.notesGraphItem.active .notesGraphActions {
+.graphItem:hover .notesGraphActions,
+.graphItem.active .notesGraphActions {
   opacity: 1;
   transform: translateX(0);
 }
 
-.notesGraphActions span {
+.graphActions span {
   font-size: 12px;
   color: var(--color-muted);
   cursor: pointer;
 }
 
-.notesGraphActions span:hover {
+.graphActions span:hover {
   color: var(--color-text);
 }
 
@@ -397,17 +397,17 @@
   text-transform: uppercase;
 }
 
-.notesSidebar h1 {
+.graphSidebar h1 {
   margin: 0;
   font-size: 26px;
 }
 
-.notesGraphList {
+.graphList {
   display: grid;
   gap: var(--space-3);
 }
 
-.notesGraphItem {
+.graphItem {
   width: 100%;
   display: grid;
   gap: var(--space-1);
@@ -424,28 +424,28 @@
     transform var(--transition-fast);
 }
 
-.notesGraphItem:hover {
+.graphItem:hover {
   transform: translateY(-1px);
   background: var(--color-surface);
 }
 
-.notesGraphItem.active {
+.graphItem.active {
   border-color: rgba(202, 167, 74, 0.55);
   background: rgba(202, 167, 74, 0.12);
 }
 
-.notesGraphItem span {
+.graphItem span {
   color: var(--color-muted);
   font-size: 13px;
 }
 
-.notesCanvasPanel {
+.graphCanvasPanel {
   position: relative;
   min-width: 0;
   min-height: 100vh;
 }
 
-.notesEmptyState {
+.graphEmptyState {
   min-height: 100vh;
   display: grid;
   place-content: center;
@@ -454,25 +454,25 @@
   text-align: center;
 }
 
-.notesEmptyState h1 {
+.graphEmptyState h1 {
   margin: 0 0 var(--space-4);
 }
 
-.notesEmptyState p {
+.graphEmptyState p {
   color: var(--color-muted);
 }
 
 @media (max-width: 850px) {
-  .notesWorkspace {
+  .graphWorkspace {
     grid-template-columns: 1fr;
   }
 
-  .notesSidebar {
+  .graphSidebar {
     border-right: 0;
     border-bottom: 1px solid var(--color-border);
   }
 
-  .notesCanvasPanel {
+  .graphCanvasPanel {
     min-height: 70vh;
   }
 }

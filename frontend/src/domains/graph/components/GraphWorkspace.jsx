@@ -1,11 +1,11 @@
 import { orgGateApi } from "../../../api";
 import LoadingScreen from "../../../common/feedback/LoadingScreen";
 import EmptyState from "../../../common/ui/EmptyState";
-import NotesSidebar from "./NotesSidebar";
+import GraphSidebar from "./GraphSidebar";
 import TreeCanvasBase from "./TreeCanvasBase";
-import { useNotesWorkspace } from "../hooks/useNotesWorkspace";
+import { useGraphWorkspace } from "../hooks/useGraphWorkspace";
 
-export default function NotesWorkspace({ readOnly = true }) {
+export default function GraphWorkspace({ readOnly = true }) {
   const {
     trees,
     activeTreeId,
@@ -17,15 +17,15 @@ export default function NotesWorkspace({ readOnly = true }) {
     createTree,
     renameTree,
     deleteTree,
-  } = useNotesWorkspace();
+  } = useGraphWorkspace();
 
   return (
     <>
       <LoadingScreen visible={loading} />
 
       {!loading && (
-        <main className="notesWorkspace">
-          <NotesSidebar
+        <main className="graphWorkspace">
+          <GraphSidebar
             trees={trees}
             activeTreeId={activeTreeId}
             error={error}
@@ -36,7 +36,7 @@ export default function NotesWorkspace({ readOnly = true }) {
             onDeleteTree={!readOnly ? deleteTree : undefined}
           />
 
-          <section className="notesCanvasPanel">
+          <section className="graphCanvasPanel">
             {treeLoading && <LoadingScreen visible text="Loading graph" />}
 
             {!treeLoading && treeData && (

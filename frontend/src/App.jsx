@@ -6,14 +6,14 @@ import Header from "./common/navigation/Header";
 
 // Admin Pages
 import AdminHome from "./admin/home/pages/AdminHome"
-import NotesAdmin from "./admin/notes/pages/NotesAdmin"
+import GraphAdmin from "./admin/graph/pages/GraphAdmin"
 import BlogCms from "./admin/blog/pages/BlogCms"
 import TasksAdmin from "./admin/tasks/pages/TasksAdmin";
-import ImportGithubRepo from "./admin/notes/pages/ImportGithubRepo";
+import ImportGithubRepo from "./admin/graph/pages/ImportGithubRepo";
 
 // Feature Pages
 import Home from "./features/home/pages/Home"
-import NotesPage from "./features/notes/pages/NotesPage"
+import GraphPage from "./features/graph/pages/GraphPage"
 import BlogPage from "./features/blog/pages/BlogPage"
 import TasksPage from "./features/tasks/pages/TasksPage"
 import RegisterPage from "./features/register/pages/RegisterPage";
@@ -48,9 +48,9 @@ export default function App() {
                   <BlogPage />
                 </OrgRouteGuard>} 
               />
-              <Route path="/notes" element={
+              <Route path="/graph" element={
                 <OrgRouteGuard>
-                  <NotesPage />
+                  <GraphPage />
                 </OrgRouteGuard>
                 } 
               />
@@ -65,8 +65,8 @@ export default function App() {
                   <AdminHome />
                 </AdminRouteGuard>
                 }>
-                <Route path="notes" element={<NotesAdmin />} />
-                <Route path="notes/import" element={<ImportGithubRepo />} />
+                <Route path="graph" element={<GraphAdmin />} />
+                <Route path="graph/import" element={<ImportGithubRepo />} />
                 <Route path="blog" element={<BlogCms />} />
                 <Route path="tasks" element={<TasksAdmin />} />
                 

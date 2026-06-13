@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { orgGateApi } from "../../../api";
 
-export function useNotesWorkspace() {
+export function useGraphWorkspace() {
   const [trees, setTrees] = useState([]);
   const [activeTreeId, setActiveTreeId] = useState(null);
   const [treeData, setTreeData] = useState(null);
