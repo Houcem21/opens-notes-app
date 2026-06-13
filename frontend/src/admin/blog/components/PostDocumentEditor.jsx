@@ -1,4 +1,4 @@
-import ErrorMessage from "../../../common/components/ErrorMessage";
+import ErrorMessage from "../../../common/feedback/ErrorMessage";
 import RichTextEditor from "./editor/RichTextEditor";
 
 export default function PostDocumentEditor({

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../feedback/ErrorMessage";
 import { orgGateApi } from "../../api";
 
 export default function AdminGate({ onSuccess }) {

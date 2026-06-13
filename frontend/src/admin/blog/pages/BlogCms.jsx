@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createEmptyPostForm } from "../../../common/constants/postDefaults";
+import { createEmptyPostForm } from "../../../domains/blog/constants/postDefaults";
 import PostDocumentEditor from "../components/PostDocumentEditor";
 
 import "../../styles/admin.css"
@@ -8,10 +8,10 @@ import { orgGateApi } from "../../../api";
 
 import {useSession} from "../../../common/session/useSession";
 
-import SplitEditorLayout from "../../../common/layout/SplitEditorLayout";
+import SplitEditorLayout from "../layout/SplitEditorLayout";
 import PostQueueSidebar from "../components/PostQueueSidebar";
 import PostSettingsPanel from "../components/PostSettingsPanel";
-import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+import LoadingScreen from "../../../common/feedback/LoadingScreen";
 
 export default function BlogCms() {
   const [posts, setPosts] = useState([]);

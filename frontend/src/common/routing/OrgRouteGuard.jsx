@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import OrgGate from "../components/OrgGate";
+import OrgGate from "../auth/OrgGate";
 import { useSession } from "../session/useSession";
 
 export default function OrgRouteGuard({ children }) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../feedback/ErrorMessage";
 import { orgGateApi } from "../../api";
 
 export default function OrgGate({ onSuccess }) {

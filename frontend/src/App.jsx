@@ -2,7 +2,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 
 // Header
-import Header from "./common/components/navigation/Header";
+import Header from "./common/navigation/Header";
 
 // Admin Pages
 import AdminHome from "./admin/home/pages/AdminHome"

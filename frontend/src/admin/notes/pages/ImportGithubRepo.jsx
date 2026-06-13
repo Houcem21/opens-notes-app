@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { orgGateApi } from "../../../api";
-import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+import LoadingScreen from "../../../common/feedback/LoadingScreen";
 
 export default function ImportGithubRepo() {
   const navigate = useNavigate();

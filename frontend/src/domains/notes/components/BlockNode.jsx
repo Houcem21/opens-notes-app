@@ -1,5 +1,10 @@
-import { memo, useEffect, useState } from "react";
+import { memo } from "react";
 import { Handle, Position } from "reactflow";
+import { useInlineNodeEdit } from "../hooks/useInlineNodeEdit";
+
+function stopNodeEvent(event) {
+  event.stopPropagation();
+}
 
 function BlockNode({ id, data, selected }) {
   const {
@@ -15,32 +20,20 @@ function BlockNode({ id, data, selected }) {
 
   const canEdit = !readOnly;
 
-  const [localTitle, setLocalTitle] = useState(title || "");
-  const [localNotes, setLocalNotes] = useState(notes || "");
-
-  useEffect(() => {
-    setLocalTitle(title || "");
-    setLocalNotes(notes || "");
-  }, [title, notes]);
-
-  function saveTitle() {
-    const nextTitle = localTitle.trim();
-
-    if (!nextTitle) {
-      setLocalTitle(title || "");
-      return;
-    }
-
-    if (nextTitle !== title) {
-      onRename?.(id, nextTitle);
-    }
-  }
-
-  function saveNotes() {
-    if ((localNotes || "") !== (notes || "")) {
-      onUpdateNotes?.(id, localNotes);
-    }
-  }
+  const {
+    localTitle,
+    localNotes,
+    setLocalTitle,
+    setLocalNotes,
+    saveTitle,
+    saveNotes,
+  } = useInlineNodeEdit({
+    id,
+    title,
+    notes,
+    onRename,
+    onUpdateNotes,
+  });
 
   return (
     <div
@@ -98,8 +91,8 @@ function BlockNode({ id, data, selected }) {
                   event.currentTarget.blur();
                 }
               }}
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={(event) => event.stopPropagation()}
+              onPointerDown={stopNodeEvent}
+              onClick={stopNodeEvent}
             />
 
             <textarea
@@ -108,8 +101,8 @@ function BlockNode({ id, data, selected }) {
               placeholder="Add notes..."
               onChange={(event) => setLocalNotes(event.target.value)}
               onBlur={saveNotes}
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={(event) => event.stopPropagation()}
+              onPointerDown={stopNodeEvent}
+              onClick={stopNodeEvent}
             />
           </>
         ) : (

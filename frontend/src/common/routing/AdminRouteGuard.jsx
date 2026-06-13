@@ -1,5 +1,5 @@
-import AdminGate from "../components/AdminGate";
-import OrgGate from "../components/OrgGate";
+import AdminGate from "../auth/AdminGate";
+import OrgGate from "../auth/OrgGate";
 import { useSession } from "../session/useSession";
 import { orgGateApi } from "../../api";
 

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import ErrorMessage from "../../../common/components/ErrorMessage";
+import ErrorMessage from "../../../common/feedback/ErrorMessage";
 import { sanitizeHtml } from "../../../common/utils/sanitizeHtml";
 import "../styles/blog.css";
 
 import { orgGateApi } from "../../../api";
 import { useSession } from "../../../common/session/useSession";
 import SidebarToggleBtn from "../../../common/ui/SidebarToggleBtn";
-import LoadingScreen from "../../../common/components/loading/LoadingScreen";
+import LoadingScreen from "../../../common/feedback/LoadingScreen";
 import EmptyState from "../../../common/ui/EmptyState";
 export default function BlogPage() {
 
