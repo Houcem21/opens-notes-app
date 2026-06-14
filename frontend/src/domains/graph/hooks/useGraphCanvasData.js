@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useEdgesState, useNodesState } from "reactflow";
-import { toFlowEdges, toFlowNodes } from "../utils/treeFlowMapping";
+import { toFlowEdges, toFlowNodes } from "../utils/graphFlowMapping";
 
-export function useTreeCanvasData({ loadGraph, readOnly }) {
-  const [tree, setTree] = useState(null);
+export function useGraphCanvasData({ loadGraph, readOnly, mode="graph" }) {
+  const [graph, setGraph] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -16,30 +16,28 @@ export function useTreeCanvasData({ loadGraph, readOnly }) {
   }, [nodes]);
 
   useEffect(() => {
-    setEdges(toFlowEdges(nodes));
-  }, [nodes, setEdges]);
-
-  useEffect(() => {
-    async function refreshTree() {
+    async function refreshGraph() {
       setLoading(true);
 
       try {
         const data = await loadGraph();
-        const nextTree = data.tree || { id: null, name: "Learning" };
+        const nextGraph = data.graph || data.tree || { id: null, name: "Learning" };
         const nextNodes = data.nodes || [];
+        const nextEdges = data.dependencies || data.edges || [];
 
-        setTree(nextTree);
-        setNodes(toFlowNodes(nextNodes, nextTree.id, readOnly));
+        setGraph(nextGraph);
+        setNodes(toFlowNodes(nextNodes, nextGraph.id, readOnly));
+        setEdges(toFlowEdges(nextEdges, mode));
       } finally {
         setLoading(false);
       }
     }
 
-    refreshTree();
+    refreshGraph();
   }, [loadGraph, readOnly, setNodes]);
 
   return {
-    tree,
+    graph,
     loading,
     nodes,
     edges,

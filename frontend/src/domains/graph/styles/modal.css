@@ -1,0 +1,80 @@
+.graphModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(14px);
+  animation: graphModalFade 0.16s ease-out;
+}
+
+.graphModalPanel {
+  position: relative;
+  width: min(440px, calc(100vw - 32px));
+  padding: var(--space-8);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border);
+  background: rgba(19, 17, 17, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  animation: graphModalPop 0.18s ease-out;
+}
+
+.graphModalPanel h2 {
+  margin: 0 0 var(--space-6);
+}
+
+.graphModalClose {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.graphModalField {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.graphModalField span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.graphModalField input,
+.graphModalField select {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 12px 14px;
+  outline: none;
+}
+
+.graphModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@keyframes graphModalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes graphModalPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

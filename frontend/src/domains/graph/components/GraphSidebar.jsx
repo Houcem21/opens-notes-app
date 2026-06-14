@@ -71,9 +71,12 @@ function GraphList({
     );
   }
 
+  
+
   return (
     <div className="graphList">
       {trees.map((tree) => (
+        
         <GraphListItem
           key={tree.id}
           tree={tree}
@@ -96,9 +99,11 @@ function GraphListItem({
   onRenameTree,
   onDeleteTree,
 }) {
+  const isTree = tree.graph_type === "tree";
+
   return (
     <button
-      className={`graphItem ${active ? "active" : ""}`}
+      className={`graphItem ${active ? "active" : ""} ${isTree ? "treeGraphItem" : ""}`}
       onClick={() => onSelectTree(tree.id)}
     >
       <span className="graphContent">

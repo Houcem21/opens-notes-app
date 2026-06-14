@@ -49,4 +49,18 @@ export const graphGateway = {
       repoUrl,
     });
   },
+
+  saveAdminEdge(edge) {
+    return callFunction("save-admin-edge", {
+      adminToken: requireAdminToken(),
+      edge,
+    });
+  },
+
+  deleteAdminEdge(edgeId) {
+    return callFunction("delete-admin-edge", {
+      adminToken: requireAdminToken(),
+      edgeId,
+    });
+  },
 };

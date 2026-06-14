@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
       return jsonResponse({
         tree: null,
         nodes: [],
-        dependencies: [],
+        edges: [],
       });
     }
 
@@ -52,18 +52,18 @@ Deno.serve(async (req) => {
 
     if (nodesError) throw nodesError;
 
-    const { data: dependencies, error: dependenciesError } = await supabase
-      .from("dependencies")
+    const { data: edges, error: edgesError } = await supabase
+      .from("edges")
       .select("*")
       .eq("tree_id", tree.id)
       .order("created_at", { ascending: true });
 
-    if (dependenciesError) throw dependenciesError;
+    if (edgesError) throw edgesError;
 
     return jsonResponse({
       tree,
       nodes: nodes || [],
-      dependencies: dependencies || [],
+      edges: edges || [],
     });
   } catch (err) {
     return jsonResponse({ error: err.message || "Unexpected error" }, 500);

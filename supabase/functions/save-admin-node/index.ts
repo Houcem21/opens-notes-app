@@ -70,6 +70,7 @@ Deno.serve(async (req) => {
       notes: node.details || node.notes || "",
       status: node.status || "not_started",
       priority: node.priority || "medium",
+      node_type: node.nodeType || node.node_type || "bubble",
       pos_x: node.pos?.x ?? 0,
       pos_y: node.pos?.y ?? 0,
       updated_at: new Date().toISOString(),

@@ -3,7 +3,7 @@ export function toFlowNodes(apiNodes, treeId, readOnly) {
 
   return apiNodes.map((node) => ({
     id: node.id,
-    type: "block",
+    type: node.node_type || "bubble",
     draggable: !readOnly,
     position: {
       x: Number(node.pos_x || 0),
@@ -16,17 +16,21 @@ export function toFlowNodes(apiNodes, treeId, readOnly) {
       treeId,
       parentId: node.parent_id,
       readOnly,
+      nodeType: node.node_type || "bubble",
     },
   }));
 }
 
-export function toFlowEdges(nodes) {
-  return nodes
-    .filter((node) => node.data?.parentId)
-    .map((node) => ({
-      id: `e-${node.data.parentId}-${node.id}`,
-      source: node.data.parentId,
-      target: node.id,
-      type: "smoothstep",
-    }));
+export function toFlowEdges(apiEdges = [], mode = "graph") {
+  const edgeType = mode === "tree" ? "smoothstep" : "straight";
+
+  return apiEdges.map((edge) => ({
+    id: edge.id,
+    source: edge.from_node_id,
+    target: edge.to_node_id,
+    type: edgeType,
+    data: {
+      edgeType: edge.edge_type || "default",
+    },
+  }));
 }

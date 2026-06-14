@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { addEdge } from "reactflow";
 import {
   createChildFlowNode,
   createNodeUpdatePayload,
@@ -6,9 +7,10 @@ import {
   updateFlowNode,
 } from "../utils/nodeActions";
 
-export function useTreeNodeActions({
+export function useGraphNodeActions({
   readOnly,
-  tree,
+  graph,
+  mode,
   nodesRef,
   setNodes,
   setEdges,
@@ -16,9 +18,11 @@ export function useTreeNodeActions({
   onCreateNode,
   onUpdateNode,
   onDeleteNode,
+  onCreateEdge,
+  onDeleteEdge
 }) {
   const addChild = useCallback(
-    async (parentId) => {
+    async (parentId, nodeType = mode === "tree" ? "block" : "bubble") => {
       if (readOnly || typeof onCreateNode !== "function") return;
 
       const parent = nodesRef.current.find((node) => node.id === parentId);
@@ -28,27 +32,53 @@ export function useTreeNodeActions({
       };
 
       const saved = await onCreateNode({
-        treeId: tree?.id,
+        treeId: graph?.id,
         parentId,
+        nodeType,
         title: "New",
         details: "",
         pos: position,
       });
 
       const savedNode = getSavedNode(saved);
+      const childNode = createChildFlowNode({
+        savedNode,
+        treeId: saved?.graph?.id || saved?.tree?.id || graph?.id,
+        parentId,
+        position,
+        readOnly,
+        nodeType,
+      });
 
-      setNodes((current) => [
-        ...current,
-        createChildFlowNode({
-          savedNode,
-          treeId: saved?.tree?.id || tree?.id,
-          parentId,
-          position,
-          readOnly,
-        }),
-      ]);
+      setNodes((current) => [...current, childNode]);
+
+      if (mode === "tree") {
+        const savedEdge = await onCreateEdge?.({
+          treeId: graph?.id,
+          sourceNodeId: parentId,
+          targetNodeId: savedNode.id,
+          type: "smoothstep",
+        });
+
+        const edge = savedEdge?.edge || savedEdge;
+
+        if (edge?.id) {
+          setEdges((current) =>
+            addEdge(
+              {
+                id: edge.id,
+                source: edge.from_node_id,
+                target: edge.to_node_id,
+                type: "smoothstep",
+                data: {},
+              },
+              current
+            )
+          );
+        }
+      }
     },
-    [readOnly, onCreateNode, nodesRef, setNodes, tree?.id]
+    [readOnly, onCreateNode, nodesRef, setNodes, graph?.id, onCreateEdge, mode]
   );
 
   const deleteNode = useCallback(
@@ -153,11 +183,50 @@ export function useTreeNodeActions({
     [readOnly, onUpdateNode, nodesRef, setNodes]
   );
 
+  const connectNodes = useCallback(
+    async (connection) => {
+      if (readOnly || typeof onCreateEdge !== "function") return;
+
+      if (!connection.source || !connection.target) return;
+      if (connection.source === connection.target) return;
+      const flowEdgeType = mode === "tree" ? "smoothstep" : "straight";
+      try {
+        const saved = await onCreateEdge({
+          treeId: graph?.id,
+          sourceNodeId: connection.source,
+          targetNodeId: connection.target,
+          label: "",
+          type: flowEdgeType,
+        });
+
+        const savedEdge = saved?.edge || saved;
+
+        setEdges((current) =>
+          addEdge(
+            {
+              id: savedEdge.id,
+              source: savedEdge.from_node_id,
+              target: savedEdge.to_node_id,
+              type: flowEdgeType,
+              data: {},
+            },
+            current
+          )
+        );
+      } catch (err) {
+        console.error("Failed to create edge:", err);
+        alert(err.message || "Failed to create edge");
+      }
+    },
+    [readOnly, onCreateEdge, graph?.id, setEdges, mode]
+  );
+
   return {
     addChild,
     deleteNode,
     renameNode,
     moveNode,
     updateDetails,
+    connectNodes
   };
 }

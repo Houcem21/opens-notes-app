@@ -45,8 +45,7 @@ export function useGraphWorkspace() {
     }
   }
 
-  async function createTree() {
-    const name = prompt("Graph name?");
+  async function createTree({ name, graphType }) {
     if (!name?.trim()) return;
 
     try {
@@ -54,6 +53,7 @@ export function useGraphWorkspace() {
 
       const data = await orgGateApi.saveAdminTree({
         name: name.trim(),
+        graphType,
       });
 
       const nextTree = data.tree;
@@ -66,7 +66,6 @@ export function useGraphWorkspace() {
   }
 
   async function renameTree(tree) {
-    const name = prompt("New graph name?", tree.name);
     if (!name?.trim()) return;
 
     try {

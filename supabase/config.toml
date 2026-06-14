@@ -602,3 +602,25 @@ entrypoint = "./functions/import-github-repo/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/import-github-repo/*.html" ]
+
+[functions.save-admin-edge]
+enabled = true
+verify_jwt = true
+import_map = "./functions/save-admin-edge/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/save-admin-edge/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/save-admin-edge/*.html" ]
+
+[functions.delete-admin-edge]
+enabled = true
+verify_jwt = true
+import_map = "./functions/delete-admin-edge/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/delete-admin-edge/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/delete-admin-edge/*.html" ]

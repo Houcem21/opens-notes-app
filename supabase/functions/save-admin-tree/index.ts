@@ -30,6 +30,7 @@ Deno.serve(async (req) => {
 
     const payload = {
       name: tree.name.trim(),
+      graph_type: tree.graphType || tree.graph_type || "general",
       organization_id: session.organization_id,
       updated_at: new Date().toISOString(),
     };
@@ -61,6 +62,7 @@ Deno.serve(async (req) => {
         tree_id: savedTree.id,
         parent_id: null,
         title: savedTree.name,
+        node_type: payload.graph_type === "tree" ? "block" : "bubble",
         notes: "",
         pos_x: 0,
         pos_y: 0,

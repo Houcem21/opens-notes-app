@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
 
     const { data: trees, error } = await supabase
       .from("trees")
-      .select("id, name, created_at, updated_at")
+      .select("id, name, graph_type, created_at, updated_at")
       .eq("organization_id", session.organization_id)
       .order("created_at", { ascending: true });
 

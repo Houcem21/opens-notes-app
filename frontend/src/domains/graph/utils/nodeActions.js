@@ -9,6 +9,7 @@ export function createNodeUpdatePayload(node, overrides = {}) {
     title: node.data?.title || "Untitled",
     details: node.data?.details || "",
     parentId: node.data?.parentId ?? null,
+    nodeType: node.type || node.data?.nodeType || "bubble",
     pos: node.position || { x: 0, y: 0 },
     ...overrides,
   };
@@ -20,10 +21,14 @@ export function createChildFlowNode({
   parentId,
   position,
   readOnly,
+  nodeType
 }) {
+  const resolvedNodeType =
+  savedNode.node_type || savedNode.nodeType || nodeType || "bubble";
+
   return {
     id: savedNode.id,
-    type: "block",
+    type: resolvedNodeType,
     draggable: !readOnly,
     position,
     data: {
@@ -33,6 +38,7 @@ export function createChildFlowNode({
       treeId,
       parentId,
       readOnly,
+      nodeType: resolvedNodeType,
     },
   };
 }

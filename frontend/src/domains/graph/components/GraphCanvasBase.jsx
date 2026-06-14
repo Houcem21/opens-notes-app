@@ -11,40 +11,49 @@ import "reactflow/dist/style.css";
 
 import LoadingScreen from "../../../common/feedback/LoadingScreen";
 import { NODE_TYPES, EDGE_TYPES } from "./flowTypes";
-import { useTreeCanvasData } from "../hooks/useTreeCanvasData";
-import { useTreeNodeActions } from "../hooks/useTreeNodeActions";
+import { useGraphCanvasData } from "../hooks/useGraphCanvasData";
+import { useGraphNodeActions } from "../hooks/useGraphNodeActions";
 
 export default function GraphCanvasBase({
+  mode = "graph",
   loadGraph,
   readOnly = true,
   onCreateNode,
   onUpdateNode,
   onDeleteNode,
+  onCreateEdge,
+  onDeleteEdge
 }) {
   return (
     <ReactFlowProvider>
-      <TreeCanvasBaseInner
+      <GraphCanvasBaseInner
         loadGraph={loadGraph}
         readOnly={readOnly}
         onCreateNode={onCreateNode}
         onUpdateNode={onUpdateNode}
         onDeleteNode={onDeleteNode}
+        onCreateEdge={onCreateEdge}
+        onDeleteEdge={onDeleteEdge}
+        mode={mode}
       />
     </ReactFlowProvider>
   );
 }
 
-function TreeCanvasBaseInner({
+function GraphCanvasBaseInner({
   loadGraph,
   readOnly,
   onCreateNode,
   onUpdateNode,
   onDeleteNode,
+  onCreateEdge,
+  onDeleteEdge,
+  mode
 }) {
   const { getIntersectingNodes } = useReactFlow();
 
   const {
-    tree,
+    graph,
     loading,
     nodes,
     edges,
@@ -53,12 +62,13 @@ function TreeCanvasBaseInner({
     nodesRef,
     onNodesChange,
     onEdgesChange,
-  } = useTreeCanvasData({ loadGraph, readOnly });
+  } = useGraphCanvasData({ loadGraph, readOnly, mode });
 
-  const { addChild, deleteNode, renameNode, moveNode, updateDetails } =
-    useTreeNodeActions({
+  const { addChild, deleteNode, renameNode, moveNode, updateDetails, connectNodes } =
+    useGraphNodeActions({
       readOnly,
-      tree,
+      graph,
+      mode,
       nodesRef,
       setNodes,
       setEdges,
@@ -66,6 +76,8 @@ function TreeCanvasBaseInner({
       onCreateNode,
       onUpdateNode,
       onDeleteNode,
+      onCreateEdge,
+      onDeleteEdge
     });
 
   const flowNodes = useMemo(() => {
@@ -100,6 +112,16 @@ function TreeCanvasBaseInner({
                 onNodeDragStop={readOnly ? undefined : moveNode}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onConnect={readOnly || mode === "tree" ? undefined : connectNodes}
+                connectionLineType={mode === "tree" ? "smoothstep" : "straight"}
+                onEdgesDelete={
+                  readOnly
+                    ? undefined
+                    : (deletedEdges) => {
+                        deletedEdges.forEach((edge) => onDeleteEdge?.(edge.id));
+                      }
+                }
+                deleteKeyCode={["Backspace", "Delete"]}
               >
                 <Background />
                 <Controls showInteractive={false} />
