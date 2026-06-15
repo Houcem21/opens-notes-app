@@ -47,7 +47,7 @@ function BlockNode({ id, data, selected }) {
         className="nodeHandle nodeHandleTarget"
       />
       <div className="blockNodeTop">
-        <span className="blockNodeType">{isRoot ? "Root" : "Node"}</span>
+        <span className="blockNodeType">{isRoot ? "Root Folder" : "Folder"}</span>
 
         {canEdit && (
           <div className="blockNodeActions">
@@ -123,7 +123,7 @@ function BlockNode({ id, data, selected }) {
 
       {canEdit && (
         <div className="blockNodeFooter">
-          <span>Drag empty areas to organize</span>
+          <span>{details || "Repo folder"}</span>
         </div>
       )}
 

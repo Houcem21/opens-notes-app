@@ -13,6 +13,13 @@ const IGNORED_PARTS = new Set([
   ".supabase",
 ]);
 
+type RepoNode = {
+  title: string;
+  parentPath: string | null;
+  depth: number;
+  path: string;
+};
+
 function parseGithubUrl(repoUrl: string) {
   const match = repoUrl.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
 
@@ -41,15 +48,13 @@ async function fetchGithubTree(owner: string, repo: string, branch: string) {
     },
   );
 
-  if (!response.ok) {
-    return null;
-  }
+  if (!response.ok) return null;
 
   return response.json();
 }
 
 function createNodeMap(paths: string[]) {
-  const nodes = new Map<string, { title: string; parentPath: string | null; depth: number }>();
+  const nodes = new Map<string, RepoNode>();
 
   for (const path of paths) {
     const parts = path.split("/");
@@ -63,6 +68,7 @@ function createNodeMap(paths: string[]) {
           title: part,
           parentPath,
           depth: index + 1,
+          path: currentPath,
         });
       }
     });
@@ -71,11 +77,58 @@ function createNodeMap(paths: string[]) {
   return nodes;
 }
 
-function getPosition(index: number, depth: number) {
-  return {
-    x: depth * 260,
-    y: index * 95,
-  };
+function groupChildren(nodes: Map<string, RepoNode>) {
+  const childrenByParent = new Map<string, RepoNode[]>();
+
+  for (const node of nodes.values()) {
+    const parentKey = node.parentPath || "__root__";
+    const children = childrenByParent.get(parentKey) || [];
+    children.push(node);
+    childrenByParent.set(parentKey, children);
+  }
+
+  for (const children of childrenByParent.values()) {
+    children.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  return childrenByParent;
+}
+
+function assignTreePositions(nodes: Map<string, RepoNode>) {
+  const childrenByParent = groupChildren(nodes);
+  const positions = new Map<string, { x: number; y: number }>();
+
+  const horizontalGap = 380;
+  const verticalGap = 170;
+
+  let nextLeafY = 0;
+
+  function layoutSubtree(parentKey: string, depth: number): number {
+    const children = childrenByParent.get(parentKey) || [];
+
+    if (children.length === 0) {
+      const y = nextLeafY;
+      nextLeafY += verticalGap;
+      return y;
+    }
+
+    const childYs = children.map((child) => {
+      const childY = layoutSubtree(child.path, depth + 1);
+
+      positions.set(child.path, {
+        x: child.depth * horizontalGap,
+        y: childY,
+      });
+
+      return childY;
+    });
+
+    return (childYs[0] + childYs[childYs.length - 1]) / 2;
+  }
+
+  layoutSubtree("__root__", 1);
+
+  return positions;
 }
 
 Deno.serve(async (req) => {
@@ -120,12 +173,16 @@ Deno.serve(async (req) => {
       .slice(0, 120);
 
     const graphName = `${repo} structure`;
+    const nodeMap = createNodeMap(paths);
+    const positions = assignTreePositions(nodeMap);
 
     const { data: tree, error: treeError } = await supabase
       .from("trees")
       .insert({
         organization_id: session.organization_id,
         name: graphName,
+        graph_type: "tree",
+        updated_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -139,6 +196,7 @@ Deno.serve(async (req) => {
         parent_id: null,
         title: repo,
         notes: `Imported from https://github.com/${owner}/${repo}`,
+        node_type: "block",
         pos_x: 0,
         pos_y: 0,
       })
@@ -147,19 +205,30 @@ Deno.serve(async (req) => {
 
     if (rootError) throw rootError;
 
-    const nodeMap = createNodeMap(paths);
     const insertedIds = new Map<string, string>();
+    const edgeRows: Array<{
+      tree_id: string;
+      from_node_id: string;
+      to_node_id: string;
+      edge_type: string;
+    }> = [];
 
-    let index = 1;
+    const sortedNodes = Array.from(nodeMap.values()).sort((a, b) => {
+      if (a.depth !== b.depth) return a.depth - b.depth;
+      return a.path.localeCompare(b.path);
+    });
 
-    for (const [path, node] of nodeMap.entries()) {
+    for (const node of sortedNodes) {
       const parentId = node.parentPath
         ? insertedIds.get(node.parentPath)
         : rootNode.id;
 
       if (!parentId) continue;
 
-      const position = getPosition(index, node.depth);
+      const position = positions.get(node.path) || {
+        x: node.depth * 380,
+        y: 0,
+      };
 
       const { data: insertedNode, error: nodeError } = await supabase
         .from("nodes")
@@ -167,7 +236,8 @@ Deno.serve(async (req) => {
           tree_id: tree.id,
           parent_id: parentId,
           title: node.title,
-          notes: path,
+          notes: node.path,
+          node_type: "block",
           pos_x: position.x,
           pos_y: position.y,
         })
@@ -176,13 +246,25 @@ Deno.serve(async (req) => {
 
       if (nodeError) throw nodeError;
 
-      insertedIds.set(path, insertedNode.id);
-      index += 1;
+      insertedIds.set(node.path, insertedNode.id);
+
+      edgeRows.push({
+        tree_id: tree.id,
+        from_node_id: parentId,
+        to_node_id: insertedNode.id,
+        edge_type: "tree",
+      });
+    }
+
+    if (edgeRows.length > 0) {
+      const { error: edgeError } = await supabase.from("edges").insert(edgeRows);
+      if (edgeError) throw edgeError;
     }
 
     return jsonResponse({
       tree,
       importedCount: insertedIds.size + 1,
+      edgeCount: edgeRows.length,
     });
   } catch (err) {
     return jsonResponse({ error: err.message || "Unexpected error" }, 500);

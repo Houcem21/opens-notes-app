@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -6,6 +6,11 @@ import ReactFlow, {
   ReactFlowProvider,
   useReactFlow,
 } from "reactflow";
+
+import {
+  calculatePageRankSteps,
+  getTopRankedNodes,
+} from "../utils/graphAnalysis";
 
 import "reactflow/dist/style.css";
 
@@ -64,7 +69,7 @@ function GraphCanvasBaseInner({
     onEdgesChange,
   } = useGraphCanvasData({ loadGraph, readOnly, mode });
 
-  const { addChild, deleteNode, renameNode, moveNode, updateDetails, connectNodes } =
+  const { addRootNode, addChild, deleteNode, renameNode, moveNode, updateDetails, connectNodes } =
     useGraphNodeActions({
       readOnly,
       graph,
@@ -80,6 +85,31 @@ function GraphCanvasBaseInner({
       onDeleteEdge
     });
 
+    const [analysisRanks, setAnalysisRanks] = useState({});
+    const [analysisRunning, setAnalysisRunning] = useState(false);
+    const [analysisResults, setAnalysisResults] = useState([]);
+
+    async function runPageRankAnimation() {
+      if (analysisRunning || nodes.length === 0) return;
+
+      const steps = calculatePageRankSteps(nodes, edges, {
+        damping: 0.85,
+        iterations: 12,
+      });
+
+      setAnalysisRunning(true);
+      setAnalysisResults([]);
+
+      for (const step of steps) {
+        setAnalysisRanks(step.ranks);
+        await new Promise((resolve) => setTimeout(resolve, 420));
+      }
+
+      const finalRanks = steps.at(-1)?.ranks || {};
+      setAnalysisResults(getTopRankedNodes(nodes, finalRanks, 5));
+      setAnalysisRunning(false);
+    }
+
   const flowNodes = useMemo(() => {
     return nodes.map((node) => ({
       ...node,
@@ -87,6 +117,7 @@ function GraphCanvasBaseInner({
       data: {
         ...node.data,
         readOnly,
+        analysisScore: analysisRanks[node.id] || 0,
         onAddChild: addChild,
         onDelete: deleteNode,
         onRename: renameNode,
@@ -102,6 +133,40 @@ function GraphCanvasBaseInner({
       {!loading && (
         <div className="canvasShell">
           <div className="canvas">
+            {!readOnly && mode === "graph" && (
+              <button
+                className="btn graphCanvasAddNodeBtn"
+                type="button"
+                onClick={addRootNode}
+              >
+                + Node
+              </button>
+            )}
+            {!readOnly && mode === "graph" && (
+              <button
+                className="btn graphCanvasAnalyzeBtn"
+                type="button"
+                onClick={runPageRankAnimation}
+                disabled={analysisRunning}
+              >
+                {analysisRunning ? "Analyzing..." : "Analyze Graph"}
+              </button>
+            )}
+
+            {analysisResults.length > 0 && (
+              <div className="graphAnalysisPanel">
+                <p className="graphEyebrow">PageRank Centrality</p>
+                <h3>Important assets</h3>
+
+                {analysisResults.map((item, index) => (
+                  <div className="graphAnalysisItem" key={item.id}>
+                    <span>{index + 1}</span>
+                    <strong>{item.title}</strong>
+                    <small>{item.score.toFixed(3)}</small>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="rf">
               <ReactFlow
                 nodes={flowNodes}
@@ -121,6 +186,7 @@ function GraphCanvasBaseInner({
                         deletedEdges.forEach((edge) => onDeleteEdge?.(edge.id));
                       }
                 }
+                connectionRadius={36}
                 deleteKeyCode={["Backspace", "Delete"]}
               >
                 <Background />

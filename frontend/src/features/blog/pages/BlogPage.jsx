@@ -77,6 +77,26 @@ export default function BlogPage() {
     );
   }
 
+  function handleReferenceClick(event) {
+    const link = event.target.closest("a[href^='ref://']");
+    if (!link) return;
+
+    event.preventDefault();
+
+    const url = new URL(link.href);
+    const type = url.hostname;
+    const id = url.pathname.replace("/", "");
+
+    if (type === "graph") {
+      window.location.href = `/graph?graphId=${id}`;
+      return;
+    }
+
+    if (type === "task") {
+      window.location.href = `/tasks?taskId=${id}`;
+    }
+  }
+
   return (
     <>
       <LoadingScreen visible={loading} />
@@ -135,9 +155,10 @@ export default function BlogPage() {
 
               <div
                 className="blogBody"
+                onClick={handleReferenceClick}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHtml(activePage.content),
-                }}            
+                }}
               />
 
               <div className="blogPageControls">

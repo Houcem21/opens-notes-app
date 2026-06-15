@@ -21,6 +21,42 @@ export function useGraphNodeActions({
   onCreateEdge,
   onDeleteEdge
 }) {
+
+  const addRootNode = useCallback(
+    async () => {
+      if (readOnly || mode !== "graph" || typeof onCreateNode !== "function") return;
+
+      const position = {
+        x: 80 + nodesRef.current.length * 40,
+        y: 80 + nodesRef.current.length * 40,
+      };
+
+      const saved = await onCreateNode({
+        treeId: graph?.id,
+        parentId: null,
+        title: "New",
+        details: "",
+        nodeType: "bubble",
+        pos: position,
+      });
+
+      const savedNode = getSavedNode(saved);
+
+      setNodes((current) => [
+        ...current,
+        createChildFlowNode({
+          savedNode,
+          treeId: saved?.graph?.id || saved?.tree?.id || graph?.id,
+          parentId: null,
+          position,
+          readOnly,
+          nodeType: "bubble",
+        }),
+      ]);
+    },
+    [readOnly, mode, onCreateNode, nodesRef, setNodes, graph?.id]
+  );
+
   const addChild = useCallback(
     async (parentId, nodeType = mode === "tree" ? "block" : "bubble") => {
       if (readOnly || typeof onCreateNode !== "function") return;
@@ -223,6 +259,7 @@ export function useGraphNodeActions({
 
   return {
     addChild,
+    addRootNode,
     deleteNode,
     renameNode,
     moveNode,

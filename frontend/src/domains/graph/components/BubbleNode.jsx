@@ -13,6 +13,7 @@ function BubbleNode({ id, data, selected }) {
     onAddChild,
     onDelete,
     onRename,
+    analysisScore= 0
   } = data;
 
   const canEdit = !readOnly;
@@ -30,6 +31,9 @@ function BubbleNode({ id, data, selected }) {
   return (
     <div
       className={`bubbleNode ${selected ? "selected" : ""}`}
+      style={{
+        "--analysis-score": analysisScore,
+      }}
     >
       <Handle
         type="target"

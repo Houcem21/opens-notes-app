@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
+
+import ReferencePickerModal from "./ReferencePickerModal";
+
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -10,6 +13,7 @@ import "./editor.css";
 export default function RichTextEditor({ value, onChange }) {
   const fileInputRef = useRef(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [referenceModalOpen, setReferenceModalOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -65,6 +69,31 @@ export default function RichTextEditor({ value, onChange }) {
 
     // reset, damit dieselbe Datei später erneut ausgewählt werden kann
     e.target.value = "";
+  }
+
+  function insertReference(reference) {
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "text",
+        text: `${reference.type}: ${reference.label}`,
+        marks: [
+          {
+            type: "link",
+            attrs: {
+              href: `ref://${reference.type}/${reference.id}`,
+              target: null,
+              rel: null,
+              class: "docReference",
+              "data-ref-type": reference.type,
+              "data-ref-id": reference.id,
+            },
+          },
+        ],
+      })
+      .insertContent(" ")
+      .run();
   }
 
   return (
@@ -124,6 +153,10 @@ export default function RichTextEditor({ value, onChange }) {
           Code
         </button>
 
+        <button type="button" onClick={() => setReferenceModalOpen(true)}>
+          Reference
+        </button>
+
         <input
           ref={fileInputRef}
           type="file"
@@ -134,6 +167,16 @@ export default function RichTextEditor({ value, onChange }) {
       </div>
 
       <EditorContent editor={editor} className="richEditorContent" />
+      {referenceModalOpen && (
+        <ReferencePickerModal
+          onClose={() => setReferenceModalOpen(false)}
+          onSelect={(reference) => {
+            insertReference(reference);
+            setReferenceModalOpen(false);
+          }}
+        />
+      )}
     </div>
+    
   );
 }
